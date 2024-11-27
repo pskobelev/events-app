@@ -8,9 +8,27 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.115.5"
-uvicorn = "^0.32.0"
+uvicorn = {extras = ["standart"], version = "^0.32.1"}
+psycopg2-binary = "^2.9.10"
+python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.36"
+pydantic = "^2.9.2"
+pydantic-settings = "^2.6.1"
+asyncpg = "^0.30.0"
+greenlet = "^3.1.1"
+ruff = "^0.8.0"
+alembic = "^1.14.0"
+
+[tool.ruff]
+line-length = 79
+indent-width = 4
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
