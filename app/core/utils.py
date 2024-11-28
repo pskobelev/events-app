@@ -1,6 +1,6 @@
 import logging
 import sys
-from app.config import get_config
+from app.core.config import get_config
 
 config = get_config()
 

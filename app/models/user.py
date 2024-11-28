@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, Integer, String, BigInteger, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.bot.models.base import Base
+from app.models.base import Base
 
 user_event_association = Table(
     "user_event",
@@ -18,7 +18,7 @@ user_event_association = Table(
 class User(Base):
     __tablename__ = "users"
 
-    telegram_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    telegram_id: Mapped[int] = mapped_column(BigInteger)
     name: Mapped[str] = mapped_column(String, nullable=False)
     username: Mapped[str] = mapped_column(String, nullable=True)
     events = relationship(

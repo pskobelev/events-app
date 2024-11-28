@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from app.config import get_config
+from app.core.config import get_config
 
 config = get_config()
-root_router = APIRouter()
+root_router = APIRouter(tags=["hello"])
 
 
 @root_router.get("/")

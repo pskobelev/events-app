@@ -18,6 +18,4 @@ class CreateUser(UserBase):
     telegram_id: int
     name: Annotated[str, MinLen(3), MaxLen(20)]
     username: Optional[str] = None
-
-    class Config:
-        orm_mode = True
+    # config = ConfigDict(from_attributes=True)

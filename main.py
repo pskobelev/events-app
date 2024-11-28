@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.api.users.views import router as users_router
-from app.config import get_config
+from app.core.config import get_config
 from app.db.routes import root_router
 
 config = get_config()
