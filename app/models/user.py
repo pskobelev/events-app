@@ -14,7 +14,7 @@ user_event_association = Table(
 class User(Base):
     __tablename__ = "users"
 
-    telegram_id: Mapped[int] = mapped_column(BigInteger)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     username: Mapped[str] = mapped_column(String, nullable=True)
     events = relationship(
@@ -34,7 +34,7 @@ class Event(Base):
     )
     min_players: Mapped[int] = mapped_column(Integer, default=10)
     location_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("locations.id"), nullable=False
+        Integer, ForeignKey("locations.id"), nullable=False,
     )
     location = relationship("Location", back_populates="events")
 
