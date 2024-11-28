@@ -22,7 +22,6 @@ SessionFactory = async_sessionmaker(
     autoflush=False,
     autocommit=False,
     expire_on_commit=False,
-
 )
 
 

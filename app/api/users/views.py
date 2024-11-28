@@ -12,6 +12,7 @@ async def add_user(user: CreateUser):
     create_user = await crud.create_user(user_in=user)
     return create_user
 
+
 @router.get("/get_user/")
 async def get_user():
     return get_all_users()

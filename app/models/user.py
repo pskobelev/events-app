@@ -6,12 +6,8 @@ from app.models.base import Base
 user_event_association = Table(
     "user_event",
     Base.metadata,
-    Column(
-        "user_id", Integer, ForeignKey("users.telegram_id"), primary_key=True
-    ),
-    Column(
-        "event_id", Integer, ForeignKey("events.events_id"), primary_key=True
-    ),
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("event_id", Integer, ForeignKey("events.id"), primary_key=True),
 )
 
 
@@ -22,18 +18,19 @@ class User(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     username: Mapped[str] = mapped_column(String, nullable=True)
     events = relationship(
-        "Event", secondary=user_event_association, back_populates="users"
+        "Event",
+        secondary=user_event_association,
+        back_populates="users",
     )
 
 
 class Event(Base):
     __tablename__ = "events"
-
-    events_id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True
-    )
+    # TODO: add status ENUM: 0: Open, 1: Closed
     users = relationship(
-        "User", secondary=user_event_association, back_populates="events"
+        "User",
+        secondary=user_event_association,
+        back_populates="events",
     )
     min_players: Mapped[int] = mapped_column(Integer, default=10)
     location_id: Mapped[int] = mapped_column(
@@ -45,9 +42,6 @@ class Event(Base):
 class Location(Base):
     __tablename__ = "locations"
 
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True
-    )
     name: Mapped[str] = mapped_column(String, nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
     events = relationship("Event", back_populates="location")
