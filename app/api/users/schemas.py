@@ -1,21 +1,20 @@
 from typing import Optional, Annotated
 
 from annotated_types import MinLen, MaxLen
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class UserBase(BaseModel):
-    pass
+    telegram_id: int = 123
+    name: Annotated[str, MinLen(3), MaxLen(20)] = "foo"
+    username: Optional[str] = "bar"
 
-
-class UserCreate(UserBase):
-    pass
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CreateUser(UserBase):
-    """Pydantic user model."""
+    pass
 
-    telegram_id: int
-    name: Annotated[str, MinLen(3), MaxLen(20)]
-    username: Optional[str] = None
-    # config = ConfigDict(from_attributes=True)
+
+class ViewUser(UserBase):
+    pass

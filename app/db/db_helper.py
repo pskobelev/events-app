@@ -12,6 +12,7 @@ from app.core.config import get_config
 # load config
 config = get_config()
 # create async engine
+
 engine = create_async_engine(
     str(config.POSTGRES_DSN),
     echo=True,
@@ -29,6 +30,3 @@ SessionFactory = async_sessionmaker(
 async def get_session():
     async with SessionFactory() as session:
         yield session
-
-
-SessionDep = Annotated[Session, Depends(get_session)]

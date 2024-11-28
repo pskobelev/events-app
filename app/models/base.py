@@ -11,6 +11,7 @@ class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
     created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.now,

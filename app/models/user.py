@@ -34,7 +34,9 @@ class Event(Base):
     )
     min_players: Mapped[int] = mapped_column(Integer, default=10)
     location_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("locations.id"), nullable=False,
+        Integer,
+        ForeignKey("locations.id"),
+        nullable=False,
     )
     location = relationship("Location", back_populates="events")
 

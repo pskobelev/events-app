@@ -4,27 +4,30 @@ from fastapi.params import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.users.schemas import CreateUser
+from app.api.users.schemas import CreateUser, ViewUser
+from app.db.db_helper import get_session
 from app.models import User
-from app.db.database import get_session
 
 
 async def create_user(
     user_in: CreateUser,
     db: AsyncSession = Depends(get_session),
 ) -> dict:
+    # Преобразуем Pydantic-модель в словарь
     new_user = user_in.model_dump()
-    db.add(new_user)
+
+    # Создаем объект SQLAlchemy
+    db_user = User(**new_user)
+    db.add(db_user)
     await db.commit()
-    await db.refresh(new_user)
+    await db.refresh(db_user)
     return {
         "success": True,
-        "user": new_user,
+        "user": db_user,
     }
 
 
-# get users
-async def get_all_users(db: AsyncSession = Depends(get_session)) -> Any:
-    users = select(User)
-    result = await db.execute(users)
-    return result.scalars().all()
+async def get_all_users(db: AsyncSession) -> Any:
+    result = await db.execute(select(User))
+    scalars__all = result.scalars().all()
+    return [ViewUser.model_validate(user) for user in scalars__all]
