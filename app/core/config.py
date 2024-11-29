@@ -1,10 +1,14 @@
 from functools import lru_cache
+from pathlib import Path
+from typing import Any
 
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ENV_FILE = ".env"
+# Получаем путь к корню проекта, независимо от того, из какого файла запускается приложение
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+ENV_FILE = str(BASE_DIR / '.env')
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=ENV_FILE)
@@ -18,6 +22,8 @@ class Config(BaseSettings):
 
     # Postgres
     POSTGRES_DSN: PostgresDsn
+    # SQL ECHO
+    DEBUG: bool = True
 
     # Bot
     BOT_TOKEN: str
@@ -35,9 +41,9 @@ class Config(BaseSettings):
 
     @property
     def API_PATH(self) -> str:
-        return f"http://{self.API_HOST}:{self.API_PORT}/"
+        return f"http://{self.API_HOST}:{self.API_PORT}"
 
 
 @lru_cache
-def get_config() -> Config:
+def get_config() -> Any:
     return Config()
