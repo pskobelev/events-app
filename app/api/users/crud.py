@@ -6,12 +6,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.users.schemas import CreateUser, ViewUser
-from app.bot.bot import logger
+from app.bot.handlers import logger
 from app.db.db_helper import get_session
 from app.models import User
 
 
-async def create_user(
+async def create_new_user(
     user_in: CreateUser,
     db: AsyncSession = Depends(get_session),
 ) -> dict:

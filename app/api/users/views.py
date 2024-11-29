@@ -12,19 +12,19 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get("/")
 async def get_user(db: AsyncSession = Depends(get_session)):
     """Read all users"""
-    users_ = await crud.get_all_users(db=db)
-    return users_
+    result = await crud.get_all_users(db=db)
+    return result
 
 
 @router.post("/add/")
 async def add_user(user: CreateUser, db: AsyncSession = Depends(get_session)):
     """Add a new user"""
-    create_user = await crud.create_user(user_in=user, db=db)
-    return create_user
+    new_user = await crud.create_new_user(user_in=user, db=db)
+    return new_user
 
 
 @router.get("/{telegram_id}", response_model=ViewUser)
 async def get_user(telegram_id: int, db: AsyncSession = Depends(get_session)):
     """Get a specific user"""
-    spec_user = await crud.get_user_info(db=db, telegram_id=telegram_id)
-    return spec_user
+    result = await crud.get_user_info(db=db, telegram_id=telegram_id)
+    return result

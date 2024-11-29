@@ -1,19 +1,32 @@
+import logging
+
+from aiogram import Router
 from aiogram.client.session import aiohttp
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from app.bot.bot import dp, URL, logger
 from app.bot.utils import handle_response
+from app.core.config import get_config
+
+cfg = get_config()
+
+logging.basicConfig(
+    level=logging.DEBUG,
+)
+logger = logging.getLogger(__name__)
+
+URL = f"{cfg.API_PATH}/users/"
+user_router = Router(name=__name__)
 
 
-@dp.message(Command(commands=["start"]))
+@user_router.message(Command(commands=["start"]))
 async def process_start_command(message: Message):
     await message.answer(
         f"I'm echo bot, write me something:\n{message.from_user}"
     )
 
 
-@dp.message(Command(commands=["reg"]))
+@user_router.message(Command(commands=["reg"]))
 async def process_reg_command(message: Message):
     # Создаем словарь с данными пользователя
     user_data = {
@@ -35,7 +48,7 @@ async def process_reg_command(message: Message):
             await message.reply(f"Unexpected error.")
 
 
-@dp.message(Command(commands=["users"]))
+@user_router.message(Command(commands=["users"]))
 async def get_users(message: Message):
     async with aiohttp.ClientSession() as session:
         try:

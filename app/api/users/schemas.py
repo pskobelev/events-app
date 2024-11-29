@@ -5,8 +5,8 @@ from pydantic import BaseModel, ConfigDict
 
 
 class UserBase(BaseModel):
-    telegram_id: int = 123
-    name: Annotated[str, MinLen(3), MaxLen(20)] = "foo"
+    telegram_id: int = 1122334455
+    name: Annotated[str, MinLen(1), MaxLen(20)] = "foo"
     username: Optional[str] = "bar"
 
     model_config = ConfigDict(from_attributes=True)
