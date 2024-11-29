@@ -17,4 +17,7 @@ class CreateUser(UserBase):
 
 
 class ViewUser(UserBase):
-    pass
+    telegram_id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)

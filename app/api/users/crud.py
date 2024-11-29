@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.users.schemas import CreateUser, ViewUser
+from app.bot.bot import logger
 from app.db.db_helper import get_session
 from app.models import User
 
@@ -17,9 +18,7 @@ async def create_user(
     # Преобразуем Pydantic-модель в словарь
     new_user = user_in.model_dump()
 
-    query = select(User).where(User.telegram_id == new_user["telegram_id"])
-    result = await db.execute(query)
-    existing_user = result.scalars().first()
+    existing_user = await get_user_info(db, user_in.telegram_id)
     if existing_user:
         raise HTTPException(
             status_code=400,
@@ -35,6 +34,13 @@ async def create_user(
         "success": True,
         "user": db_user,
     }
+
+
+async def get_user_info(db: AsyncSession, telegram_id: int) -> User | None:
+    logger.debug(f"Telegram ID: {telegram_id}")
+    query = select(User).where(User.telegram_id == telegram_id)
+    result = await db.execute(query)
+    return result.scalars().first()
 
 
 async def get_all_users(db: AsyncSession) -> Any:
