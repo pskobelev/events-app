@@ -1,5 +1,6 @@
 from typing import Any
 
+from fastapi import HTTPException
 from fastapi.params import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +16,15 @@ async def create_user(
 ) -> dict:
     # Преобразуем Pydantic-модель в словарь
     new_user = user_in.model_dump()
+
+    query = select(User).where(User.telegram_id == new_user["telegram_id"])
+    result = await db.execute(query)
+    existing_user = result.scalars().first()
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="User already exists",
+        )
 
     # Создаем объект SQLAlchemy
     db_user = User(**new_user)
