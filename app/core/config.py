@@ -27,10 +27,15 @@ class Config(BaseSettings):
     API_NAME: str = "Event App"
     API_V1_STR: str = "/api/v1"
     API_HOST: str
+    API_PORT: int
 
     @property
     def WEBHOOK_PATH(self) -> str:
         return f"{self.API_V1_STR}/webhook"
+
+    @property
+    def API_PATH(self) -> str:
+        return f"http://{self.API_HOST}:{self.API_PORT}/"
 
 
 @lru_cache

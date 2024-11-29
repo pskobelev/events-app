@@ -1,11 +1,7 @@
-from typing import Annotated
-
-from fastapi import Depends
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.orm import Session
 
 from app.core.config import get_config
 
