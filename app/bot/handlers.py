@@ -1,5 +1,3 @@
-import logging
-
 from aiogram import Router
 from aiogram.client.session import aiohttp
 from aiogram.filters import Command
@@ -7,13 +5,11 @@ from aiogram.types import Message
 
 from app.bot.utils import handle_response
 from app.core.config import get_config
+from core.utils import get_logger
+
+logger = get_logger()
 
 cfg = get_config()
-
-logging.basicConfig(
-    level=logging.DEBUG,
-)
-logger = logging.getLogger(__name__)
 
 URL = f"{cfg.API_PATH}/users/"
 user_router = Router(name=__name__)
@@ -55,9 +51,12 @@ async def get_users(message: Message):
             async with session.get(URL) as resp:
                 try:
                     text = await handle_response(resp)
+                    logger.debug(f"Status Code: {resp.status}, URL: {URL}")
+
                     return await message.answer(text)
                 except ValueError as e:
-                    logger.error(f"ValueError: {e}")
+                    logger.error(f"ValueError: {e}, Status Code: {resp.status}, URL: {URL}")
+
                     await message.answer(f"Error: {e}")
         except Exception as e:
             logger.error(e)

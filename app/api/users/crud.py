@@ -6,10 +6,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.users.schemas import CreateUser, ViewUser
-from app.bot.handlers import logger
 from app.db.db_helper import get_session
 from app.models import User
+from core.utils import get_logger
 
+logger = get_logger()
 
 async def create_new_user(
     user_in: CreateUser,
@@ -20,6 +21,7 @@ async def create_new_user(
 
     existing_user = await get_user_info(db, user_in.telegram_id)
     if existing_user:
+        logger.info(f"Find existing user: {existing_user.telegram_id}")
         raise HTTPException(
             status_code=400,
             detail="User already exists",
