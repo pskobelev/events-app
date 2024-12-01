@@ -6,8 +6,16 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    """Base class for all models."""
+    """
+    An abstract base class for SQLAlchemy models with asynchronous attributes.
 
+    Attributes:
+        id (Mapped[int]): The primary key for the model.
+        created_at (Mapped[DateTime]): The timestamp when the record was created,
+            with a default value of the current timestamp.
+        updated_at (Mapped[DateTime]): The timestamp when the record was last updated,
+            automatically set to the current timestamp on update.
+    """
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)

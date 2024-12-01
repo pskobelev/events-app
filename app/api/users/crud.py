@@ -39,11 +39,22 @@ async def create_new_user(
     }
 
 
-async def get_user_info(db: AsyncSession, telegram_id: int) -> User | None:
+async def get_user_info(db: AsyncSession, telegram_id: int) -> Any:
+    """
+    Find user by telegram id
+    :param db:
+    :param telegram_id:
+    :return:
+    """
+
     logger.debug(f"Telegram ID: {telegram_id}")
     query = select(User).where(User.telegram_id == telegram_id)
     result = await db.execute(query)
-    return result.scalars().first()
+    user = result.scalars().first()
+    if user:
+        return user
+    else:
+        return None
 
 
 async def get_all_users(db: AsyncSession) -> Any:
