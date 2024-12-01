@@ -36,6 +36,7 @@ def get_logger():
     :return:
     """
     import inspect
+
     frame = inspect.stack()[1]
     module_name = inspect.getmodule(frame[0]).__name__
 

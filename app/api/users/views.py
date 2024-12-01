@@ -28,3 +28,9 @@ async def get_user(telegram_id: int, db: AsyncSession = Depends(get_session)):
     """Get a specific user"""
     result = await crud.get_user_info(db=db, telegram_id=telegram_id)
     return result
+
+
+@router.delete("/{telegram_id}")
+async def delete_user(telegram_id: int, db: AsyncSession = Depends(get_session)):
+    result = await crud.delete_user(db=db, telegram_id=telegram_id)
+    return result

@@ -12,6 +12,7 @@ from core.utils import get_logger
 
 logger = get_logger()
 
+
 async def create_new_user(
     user_in: CreateUser,
     db: AsyncSession = Depends(get_session),
@@ -49,3 +50,18 @@ async def get_all_users(db: AsyncSession) -> Any:
     result = await db.execute(select(User))
     scalars__all = result.scalars().all()
     return [ViewUser.model_validate(user) for user in scalars__all]
+
+
+async def delete_user(db: AsyncSession, telegram_id: int) -> dict:
+    logger.debug(f"Start delete user: {telegram_id}")
+    query = select(User).where(User.telegram_id == telegram_id)
+    result = await db.execute(query)
+    user = result.scalars().first()
+    if user:
+        await db.delete(user)
+        await db.commit()
+        logger.debug(f"Deleted user: {telegram_id} complete")
+        return {"success": True}
+    else:
+        logger.debug(f"User not found: {telegram_id}")
+        return {"success": False}

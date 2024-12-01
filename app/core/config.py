@@ -8,7 +8,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Получаем путь к корню проекта, независимо от того, из какого файла запускается приложение
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-ENV_FILE = str(BASE_DIR / '.env')
+ENV_FILE = str(BASE_DIR / ".env")
+
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=ENV_FILE)
@@ -45,5 +46,5 @@ class Config(BaseSettings):
 
 
 @lru_cache
-def get_config() -> Any:
+def get_config() -> Config:
     return Config()

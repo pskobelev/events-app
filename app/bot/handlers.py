@@ -17,9 +17,7 @@ user_router = Router(name=__name__)
 
 @user_router.message(Command(commands=["start"]))
 async def process_start_command(message: Message):
-    await message.answer(
-        f"I'm echo bot, write me something:\n{message.from_user}"
-    )
+    await message.answer(f"I'm echo bot, write me something:\n{message.from_user}")
 
 
 @user_router.message(Command(commands=["reg"]))

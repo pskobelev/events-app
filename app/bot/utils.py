@@ -16,6 +16,4 @@ async def handle_response(resp):
     else:
         error_data = await resp.json()
         error_text = await format_text(error_data)
-        raise ValueError(
-            f"Server responded with an error: {resp.status}, {error_text}"
-        )
+        raise ValueError(f"Server responded with an error: {resp.status}, {error_text}")
