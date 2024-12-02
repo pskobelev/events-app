@@ -9,8 +9,8 @@ from app.db.db_helper import get_session
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("/")
-async def get_user(db: AsyncSession = Depends(get_session)):
+@router.get("/", response_model=list[ViewUser])
+async def get_user(db: AsyncSession = Depends(get_session), ):
     """Read all users"""
     result = await crud.get_all_users(db=db)
     return result

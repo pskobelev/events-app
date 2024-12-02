@@ -59,3 +59,8 @@ async def get_users(message: Message):
         except Exception as e:
             logger.error(e)
             await message.reply(f"Error exception: {e}")
+
+
+@user_router.message(Command(commands=["game"]))
+async def process_game_command(message: Message):
+    pass

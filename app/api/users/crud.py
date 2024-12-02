@@ -17,6 +17,7 @@ async def create_new_user(
     user_in: CreateUser,
     db: AsyncSession = Depends(get_session),
 ) -> dict:
+    """Create a new user."""
     # Преобразуем Pydantic-модель в словарь
     new_user = user_in.model_dump()
 
@@ -57,13 +58,15 @@ async def get_user_info(db: AsyncSession, telegram_id: int) -> Any:
         return None
 
 
-async def get_all_users(db: AsyncSession) -> Any:
+async def get_all_users(db: AsyncSession) -> list[ViewUser]:
+    """Return all users"""
     result = await db.execute(select(User))
     scalars__all = result.scalars().all()
     return [ViewUser.model_validate(user) for user in scalars__all]
 
 
 async def delete_user(db: AsyncSession, telegram_id: int) -> dict:
+    """Find user by telegram id and delete it"""
     logger.debug(f"Start delete user: {telegram_id}")
     query = select(User).where(User.telegram_id == telegram_id)
     result = await db.execute(query)
