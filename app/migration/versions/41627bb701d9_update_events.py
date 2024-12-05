@@ -1,8 +1,8 @@
-"""Reafactor base model
+"""update events
 
-Revision ID: 3c3b52d1b6a5
+Revision ID: 41627bb701d9
 Revises:
-Create Date: 2024-11-28 12:16:36.463688
+Create Date: 2024-12-03 13:38:46.460347
 
 """
 
@@ -10,10 +10,10 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "3c3b52d1b6a5"
+revision: str = "41627bb701d9"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -49,9 +49,16 @@ def upgrade() -> None:
         ),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("telegram_id"),
     )
     op.create_table(
         "events",
+        sa.Column("chat_id", sa.Integer(), nullable=False),
+        sa.Column(
+            "status",
+            postgresql.ENUM("NEW", "COMPLETED", name="event_status_enum"),
+            nullable=False,
+        ),
         sa.Column("min_players", sa.Integer(), nullable=False),
         sa.Column("location_id", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),

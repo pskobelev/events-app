@@ -1,7 +1,8 @@
 from aiogram import Bot, Dispatcher
-from core.utils import get_logger
+
 from app.bot.handlers import user_router
 from app.core.config import get_config
+from app.core.utils import get_logger
 
 logger = get_logger()
 

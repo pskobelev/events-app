@@ -1,3 +1,5 @@
+from venv import logger
+
 from fastapi import APIRouter
 from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,15 +12,21 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/", response_model=list[ViewUser])
-async def get_user(db: AsyncSession = Depends(get_session), ):
+async def get_user(
+        db: AsyncSession = Depends(get_session),
+):
     """Read all users"""
-    result = await crud.get_all_users(db=db)
-    return result
+    # result = await get_all_users(db=db)
+    # return result
+    pass
 
 
-@router.get("/{telegram_id}", response_model=ViewUser)
-async def get_spec_user(telegram_id: int, db: AsyncSession = Depends(get_session)):
+@router.get("/{telegram_id}", response_model=list[ViewUser])
+async def get_spec_user(
+        telegram_id: int, db: AsyncSession = Depends(get_session)
+):
     """Get a specific user"""
+    logger.debug(f"tg user id: {telegram_id}")
     result = await crud.get_user_info(db=db, telegram_id=telegram_id)
     return result
 
@@ -35,13 +43,14 @@ async def add_user(user: CreateUser, db: AsyncSession = Depends(get_session)):
     Returns:
         dict: A dictionary containing the success status and the newly created user.
     """
-
     new_user = await crud.create_new_user(user_in=user, db=db)
     return new_user
 
 
 @router.delete("/{telegram_id}")
-async def delete_user(telegram_id: int, db: AsyncSession = Depends(get_session)):
+async def delete_user(
+        telegram_id: int, db: AsyncSession = Depends(get_session)
+):
     """
     Delete a user by their Telegram ID.
 

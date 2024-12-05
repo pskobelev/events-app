@@ -16,6 +16,7 @@ class Base(AsyncAttrs, DeclarativeBase):
         updated_at (Mapped[DateTime]): The timestamp when the record was last updated,
             automatically set to the current timestamp on update.
     """
+
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)

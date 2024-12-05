@@ -18,7 +18,7 @@ async def hello() -> dict:
 
 
 @root_router.get("/{name}")
-async def hello(name: Annotated[str, MinLen(3), MaxLen(10)]) -> dict:
+async def hello_name(name: Annotated[str, MinLen(3), MaxLen(10)]) -> dict:
     return {
         "hello": name,
         "name_len_is": len(name),

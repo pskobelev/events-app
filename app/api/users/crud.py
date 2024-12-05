@@ -5,28 +5,41 @@ from fastapi.params import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.users.schemas import CreateUser, ViewUser
+from app.api.users.schemas import CreateUser
+from app.core.utils import get_logger
 from app.db.db_helper import get_session
 from app.models import User
-from core.utils import get_logger
 
 logger = get_logger()
 
 
 async def create_new_user(
-    user_in: CreateUser,
-    db: AsyncSession = Depends(get_session),
+        user_in: CreateUser, db: AsyncSession = Depends(get_session)
 ) -> dict:
-    """Create a new user."""
+    """
+    Создает нового пользователя.
+
+    Args:
+        user_in: Модель данных пользователя.
+        db: Сессия базы данных.
+
+    Returns:
+        Словарь с результатом операции.
+
+    Raises:
+        HTTPException: Если пользователь уже существует.
+    """
     # Преобразуем Pydantic-модель в словарь
     new_user = user_in.model_dump()
 
     existing_user = await get_user_info(db, user_in.telegram_id)
     if existing_user:
-        logger.info(f"Find existing user: {existing_user.telegram_id}")
+        logger.info(
+            f"Найден существующий пользователь: {existing_user.telegram_id}"
+        )
         raise HTTPException(
             status_code=400,
-            detail="User already exists",
+            detail="Пользователь уже существует",
         )
 
     # Создаем объект SQLAlchemy
@@ -56,13 +69,6 @@ async def get_user_info(db: AsyncSession, telegram_id: int) -> Any:
         return user
     else:
         return None
-
-
-async def get_all_users(db: AsyncSession) -> list[ViewUser]:
-    """Return all users"""
-    result = await db.execute(select(User))
-    scalars__all = result.scalars().all()
-    return [ViewUser.model_validate(user) for user in scalars__all]
 
 
 async def delete_user(db: AsyncSession, telegram_id: int) -> dict:
