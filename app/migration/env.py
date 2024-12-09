@@ -13,7 +13,8 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 from app.models.base import Base
-from app.models.user import User, Event, Location
+
+# from app.models.user import User, Event
 
 bot_config = get_config()
 config = context.config

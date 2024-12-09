@@ -1,4 +1,4 @@
-__all__ = ["Event", "Location", "User", "Base"]
-
 from .base import Base
-from .user import Event, Location, User
+from .models import Event, User, UserEvent
+
+__all__ = ["Event", "User", "Base", "UserEvent"]

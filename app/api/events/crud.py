@@ -1,35 +1,17 @@
-from fastapi.params import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from api.events.schemas import CreateEvent
 from core.utils import get_logger
-from db.db_helper import get_session
+from db.db_helper import connection
 from models import Event
 
-log = get_logger()
+logger = get_logger()
 
 
-async def create_event(
-        msg,
-        event_in: CreateEvent,
-        db: AsyncSession = Depends(get_session()),
-):
-    """Create a new event."""
-    new_event = msg.model_dump()
-    log.debug(new_event)
-    new_event = Event(**new_event)
-    log.debug(new_event)
-    db.add(new_event)
-    await db.commit()
-    await db.refresh(new_event)
+@connection
+async def create_new_event(event, session) -> dict:
+    new_event = Event(**(event.model_dump()))
+    logger.debug(f"New_event: {new_event}")
+    session.add(new_event)
+    await session.commit()
+    await session.refresh(new_event)
     return {
-        "status":   "ok",
-        "event_id": new_event.id,
+        'success': True,
     }
-
-
-async def event_cancel(
-        db: AsyncSession = Depends(get_session()),
-):
-    """Cancel an event."""
-    pass

@@ -1,13 +1,15 @@
+import logging
+
 import uvicorn
 from fastapi import FastAPI
 
-from app.api.events.views import router as events_router
 from app.api.users.views import router as users_router
+from app.api.events.views import router as events_router
+
 from app.core.config import get_config
-from app.core.utils import get_logger
 from app.db.routes import root_router
 
-logger = get_logger()
+logger = logging.getLogger(__name__)
 config = get_config()
 
 logger.info("Starting FastAPI app")

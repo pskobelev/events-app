@@ -8,14 +8,14 @@ from app.core.config import get_config
 
 # load config
 config = get_config()
-# create async engine
 
+# Создаем асинхронный движок для работы с базой данных
 engine = create_async_engine(
     str(config.POSTGRES_DSN),
     echo=config.DEBUG,
 )
-# create async session
-SessionFactory = async_sessionmaker(
+# Создаем фабрику сессий для взаимодействия с базой данных
+async_session_maker = async_sessionmaker(
     bind=engine,
     autoflush=False,
     autocommit=False,
@@ -23,7 +23,16 @@ SessionFactory = async_sessionmaker(
 )
 
 
-# create async session dependency
-async def get_session():
-    async with SessionFactory() as session:
-        yield session
+def connection(method):
+    async def wrapper(*args, **kwargs):
+        async with async_session_maker() as session:
+            try:
+                # Явно не открываем транзакции, так как они уже есть в контексте
+                return await method(*args, session=session, **kwargs)
+            except Exception as e:
+                await session.rollback()  # Откатываем сессию при ошибке
+                raise e  # Поднимаем исключение дальше
+            finally:
+                await session.close()  # Закрываем сессию
+
+    return wrapper

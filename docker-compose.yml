@@ -1,0 +1,10 @@
+services:
+  de-postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+    container_name: de-postgres
+    ports:
+      - "${DB_PORT}:${DB_PORT}"

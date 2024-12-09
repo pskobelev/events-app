@@ -6,8 +6,8 @@ from pydantic import BaseModel, ConfigDict
 
 class UserBase(BaseModel):
     telegram_id: int = 12345
-    name: Annotated[str, MinLen(1), MaxLen(20)] = "foo"
-    username: Optional[str] = "bar"
+    name: Annotated[str, MinLen(1), MaxLen(20)] = "Людмил"
+    username: Optional[str] = "Огурченко"
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -15,8 +15,5 @@ class UserBase(BaseModel):
 class ViewUser(BaseModel):
     telegram_id: int
     name: str
+
     model_config = ConfigDict(from_attributes=True)
-
-
-class CreateUser(UserBase):
-    pass

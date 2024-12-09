@@ -2,7 +2,8 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, func
 from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, \
+    declared_attr, class_mapper
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -31,3 +32,12 @@ class Base(AsyncAttrs, DeclarativeBase):
         default=datetime.now,
         onupdate=datetime.now,
     )
+
+    # чтобы не придумывать названия таблиц, они будут создаваться от класса
+    @declared_attr.directive
+    def __tablename__(cls) -> str:
+        return cls.__name__.lower() + "s"
+
+    def as_dict(self):
+        columns = class_mapper(self.__class__).columns
+        return {c.name: getattr(self, c.name) for c in columns}

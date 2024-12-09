@@ -1,65 +1,33 @@
-from venv import logger
-
-from fastapi import APIRouter
-from fastapi.params import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.api.users import crud
-from app.api.users.schemas import CreateUser, ViewUser
-from app.db.db_helper import get_session
+from api.users.crud import (
+    create_new_user, get_all_users, get_user_by_telegram_id
+)
+from api.users.schemas import UserBase, ViewUser
+from core.utils import get_logger
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/users", tags=["users"])
-
-
-@router.get("/", response_model=list[ViewUser])
-async def get_user(
-        db: AsyncSession = Depends(get_session),
-):
-    """Read all users"""
-    # result = await get_all_users(db=db)
-    # return result
-    pass
-
-
-@router.get("/{telegram_id}", response_model=list[ViewUser])
-async def get_spec_user(
-        telegram_id: int, db: AsyncSession = Depends(get_session)
-):
-    """Get a specific user"""
-    logger.debug(f"tg user id: {telegram_id}")
-    result = await crud.get_user_info(db=db, telegram_id=telegram_id)
-    return result
+logger = get_logger()
 
 
 @router.post("/add/")
-async def add_user(user: CreateUser, db: AsyncSession = Depends(get_session)):
-    """
-    Add a new user to the database.
-
-    Args:
-        user (CreateUser): The user data to be added.
-        db (AsyncSession, optional): The database session dependency.
-
-    Returns:
-        dict: A dictionary containing the success status and the newly created user.
-    """
-    new_user = await crud.create_new_user(user_in=user, db=db)
-    return new_user
+async def add_user(user: UserBase):
+    new_user = await create_new_user(user_in=user)
+    if new_user:
+        return new_user
+    raise HTTPException(201, detail="User already exists")
 
 
-@router.delete("/{telegram_id}")
-async def delete_user(
-        telegram_id: int, db: AsyncSession = Depends(get_session)
-):
-    """
-    Delete a user by their Telegram ID.
+@router.get("/{telegram_id}")
+async def get_user(telegram_id: int):
+    id_ = await get_user_by_telegram_id(telegram_id)
+    if id_:
+        return ViewUser.model_validate(id_)
+    raise HTTPException(status_code=404, detail="User not found")
 
-    Args:
-        telegram_id (int): The Telegram ID of the user to be deleted.
-        db (AsyncSession, optional): The database session dependency.
 
-    Returns:
-        dict: A dictionary indicating the success status of the deletion operation.
-    """
-    result = await crud.delete_user(db=db, telegram_id=telegram_id)
-    return result
+@router.get("/all_users")
+async def get_users():
+    result = await get_all_users()
+    for i in result:
+        user_res = ViewUser.model_validate(i)
+        return user_res.model_dump()

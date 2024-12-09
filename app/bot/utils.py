@@ -2,8 +2,7 @@ import json
 
 
 async def format_text(msg):
-    formatted_msg = json.dumps(msg, indent=2)
-    return formatted_msg
+    return json.dumps(msg, ensure_ascii=False, indent=2)
 
 
 async def handle_response(resp):

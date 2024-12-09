@@ -23,11 +23,15 @@ async def process_reg_command(message: Message):
         "name": message.from_user.first_name,
         "username": message.from_user.username,
     }
+    logger.debug(f"user_data: {user_data}")
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(URL + "users/add/", json=user_data) as resp:
+            async with session.post(
+                    URL + "/users/add/", json=user_data
+            ) as resp:
                 try:
                     text = await handle_response(resp)
+                    logger.debug(f"text: {text}")
                     await message.answer(f"Welcome!\n\n{text}")
                 except ValueError as e:
                     logger.error("ValueError", e)
@@ -40,10 +44,14 @@ async def process_reg_command(message: Message):
 @user_router.message(Command(commands=["new_game"]))
 async def process_text_command(message: Message):
     """Start a new game"""
+
+    chat_id = message.chat.id
+    logger.debug(chat_id)
+
     async with aiohttp.ClientSession() as session:
         async with session.post(
                 URL + "/events/add/",
-                json={"name": message.text},
+                json={"name": message.text, "chat_id": chat_id},
         ) as resp:
             logger.debug(resp)
             try:
