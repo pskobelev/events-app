@@ -4,3 +4,8 @@ BUTTONS = [
     {"text": "Думаю 🫠", "choice": "thinking"},
     {"text": "foo", "choice": "bar"},
 ]
+
+MENU = [{
+    "start": "tbd",
+    "help":  "Show all commands",
+}]

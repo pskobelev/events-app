@@ -1,4 +1,5 @@
 from aiogram import Bot, Dispatcher
+from aiogram.exceptions import TelegramNetworkError
 
 from app.bot.handlers import user_router
 from app.core.config import get_config
@@ -9,11 +10,14 @@ config = get_config()
 
 BOT_TOKEN = config.BOT_TOKEN
 
-logger.debug("Loading bot...")
+logger.info("Loading bot...")
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 dp.include_router(user_router)
-logger.debug("Bot is started!")
+logger.info("Bot is started!")
 
 if __name__ == "__main__":
-    dp.run_polling(bot)
+    try:
+        dp.run_polling(bot)
+    except TelegramNetworkError:
+        logger.exception("Network Error", exc_info=False, )
