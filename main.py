@@ -1,25 +1,19 @@
-import logging
+import asyncio
+from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
 
-from app.api.users.views import router as users_router
-from app.api.events.views import router as events_router
-
 from app.core.config import get_config
 from app.db.routes import root_router
-
-logger = logging.getLogger(__name__)
+from app.api.users.views import router as users_router
 config = get_config()
 
-logger.info("Starting FastAPI app")
 
 app = FastAPI(title=str(config.API_NAME))
-app.include_router(root_router)
 app.include_router(users_router)
-app.include_router(events_router)
+app.include_router(root_router)
 
-logger.debug("App started")
 
 if __name__ == "__main__":
     try:

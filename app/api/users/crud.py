@@ -1,34 +1,32 @@
 from sqlalchemy import select
+from sqlalchemy.engine import Result
 
-from app.core.utils import get_logger
-from db.db_helper import connection
+from db.dependency import get_one_user_by_telegram_id
 from models import User
+from core.utils import configure_logging
 
-logger = get_logger()
+logger = configure_logging()
 
 
-@connection
-async def create_new_user(user_in, session) -> dict:
+async def create_new_user(user_in, session) -> User:
     new_user = User(**(user_in.model_dump()))
-    if not await get_user_by_telegram_id(new_user.telegram_id):
+    if not await get_one_user_by_telegram_id(new_user.telegram_id):
         session.add(new_user)
         await session.commit()
-        return {
-            "success": True,
-            "data":    new_user.id,
-        }
+        return new_user
 
 
-@connection
-async def get_all_users(session) -> dict:
-    query = select(User)
-    result = await session.execute(query)
-    records = result.scalars().all()
-    return records
+async def get_all_users(session) -> list[User]:
+    stmt = select(User).order_by(User.telegram_id)
+    result: Result = await session.execute(stmt)
+    users = result.scalars().all()
+    return list(users)
 
 
-@connection
-async def get_user_by_telegram_id(telegram_id: int, session) -> dict:
-    query = select(User).filter_by(telegram_id=telegram_id)
-    result = await session.execute(query)
+async def get_one_user_by_telegram_id(telegram, session) -> User | None:
+    stmt = select(User).where(User.telegram_id == telegram)
+    result: Result = await session.execute(stmt)
+    logger.debug(f"Result: {result}")
     return result.scalars().first()
+
+# 827816

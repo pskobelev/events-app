@@ -2,9 +2,9 @@ from aiogram import Bot, Dispatcher
 
 from app.bot.handlers import user_router
 from app.core.config import get_config
-from app.core.utils import get_logger
+from app.core.utils import configure_logging
 
-logger = get_logger()
+logger = configure_logging()
 config = get_config()
 
 BOT_TOKEN = config.BOT_TOKEN

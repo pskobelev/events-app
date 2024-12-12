@@ -1,38 +1,53 @@
+from asyncio import current_task
+from dataclasses import dataclass
+
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
-    create_async_engine,
+    create_async_engine, AsyncSession, async_scoped_session,
 )
 
 from app.core.config import get_config
 
-
 # load config
 config = get_config()
 
-# Создаем асинхронный движок для работы с базой данных
-engine = create_async_engine(
-    str(config.POSTGRES_DSN),
+
+@dataclass
+class DatabaseHelper:
+    url: str
+    echo: bool = False
+
+    def __post_init__(self):
+        self.engine = create_async_engine(
+            url=self.url,
+            echo=self.echo,
+        )
+        self.session_factory = async_sessionmaker(
+            bind=self.engine,
+            autoflush=False,
+            autocommit=False,
+            expire_on_commit=False,
+        )
+
+    def get_scoped_session(self):
+        session = async_scoped_session(
+            session_factory=self.session_factory,
+            scopefunc=current_task,
+        )
+        return session
+
+    async def session_dependency(self) -> AsyncSession:
+        async with self.session_factory() as session:
+            yield session
+            await session.close()
+
+    async def scoped_session_dependency(self) -> AsyncSession:
+        session = self.get_scoped_session()
+        yield session
+        await session.close()
+
+
+db_helper = DatabaseHelper(
+    url=config.POSTGRES_DSN,
     echo=config.DEBUG,
 )
-# Создаем фабрику сессий для взаимодействия с базой данных
-async_session_maker = async_sessionmaker(
-    bind=engine,
-    autoflush=False,
-    autocommit=False,
-    expire_on_commit=False,
-)
-
-
-def connection(method):
-    async def wrapper(*args, **kwargs):
-        async with async_session_maker() as session:
-            try:
-                # Явно не открываем транзакции, так как они уже есть в контексте
-                return await method(*args, session=session, **kwargs)
-            except Exception as e:
-                await session.rollback()  # Откатываем сессию при ошибке
-                raise e  # Поднимаем исключение дальше
-            finally:
-                await session.close()  # Закрываем сессию
-
-    return wrapper

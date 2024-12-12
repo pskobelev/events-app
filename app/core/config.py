@@ -1,4 +1,5 @@
 from functools import lru_cache
+from logging import getLogger
 from pathlib import Path
 
 from pydantic import PostgresDsn
@@ -8,7 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 ENV_FILE = str(BASE_DIR / ".env")
-
+log = getLogger(__name__)
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=ENV_FILE)
@@ -21,7 +22,7 @@ class Config(BaseSettings):
     DB_NAME: str
 
     # Postgres
-    POSTGRES_DSN: PostgresDsn
+    POSTGRES_DSN: str | PostgresDsn
     # SQL ECHO
     DEBUG: bool = True
 
@@ -46,4 +47,5 @@ class Config(BaseSettings):
 
 @lru_cache
 def get_config() -> Config:
+    log.info("Loading config.")
     return Config()

@@ -5,9 +5,9 @@ from aiogram.types import Message
 
 from app.bot.utils import handle_response
 from app.core.config import get_config
-from core.utils import get_logger
+from core.utils import configure_logging
 
-logger = get_logger()
+logger = configure_logging()
 cfg = get_config()
 
 URL = f"{cfg.API_PATH}"

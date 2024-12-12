@@ -1,15 +1,12 @@
 import logging
 
 
-def get_logger(name: str = __name__, level=logging.DEBUG) -> logging.Logger:
-    formatter = logging.Formatter(
-        fmt="%(asctime)s - %(levelname)s - [%(filename)s:%("
-            "lineno)d] - %(message)s"
+def configure_logging(
+        level=logging.INFO):
+    logging.basicConfig(
+        format="%(asctime)s %(name)-12s [%(levelname)-7s]-[:%(lineno)d] - %(message)s"
     )
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
+    logger = logging.getLogger()
+    logger.setLevel(level=level)
 
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    logger.addHandler(handler)
     return logger

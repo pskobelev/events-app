@@ -1,4 +1,6 @@
-from .base import Base
-from .models import Event, User, UserEvent
+__all__ = ["User", "Event", "UserEvent", "Base", "DatabaseHelper", "db_helper"]
 
-__all__ = ["Event", "User", "Base", "UserEvent"]
+from .base import Base
+from db.db_helper import DatabaseHelper, db_helper
+from .event import Event, UserEvent
+from .user import User
