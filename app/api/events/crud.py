@@ -16,7 +16,6 @@ async def create_new_event(event, session) -> dict:
         return {
             "success": True,
         }
-
     raise HTTPException(status_code=400, detail="Event already exists")
 
 
