@@ -1,9 +1,12 @@
+import os
+
 from pydantic import BaseModel, PostgresDsn
-from pydantic_settings import (
-    BaseSettings, SettingsConfigDict
-)
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LOG_DEFAULT_FORMAT = "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
+# Вычисляем абсолютный путь к .env
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ENV_PATH = os.path.join(BASE_DIR, ".env")
 
 
 class RunConfig(BaseModel):
@@ -26,14 +29,16 @@ class DatabaseConfig(BaseModel):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file="/Users/pskobelev/Developer/_PROJECTS/event_app/.env",
+        env_file=ENV_PATH,
+        env_file_encoding="utf-8",
+        env_nested_delimiter="_",
         case_sensitive=False,
     )
 
     run: RunConfig = RunConfig()
     logging: LoggingConfig = LoggingConfig()
-    bot: BotConfig = BotConfig(token="")
-    db: DatabaseConfig = DatabaseConfig(
-        url="postgresql+asyncpg://admin:qwe123@192.168.1.140:5432/events")
+    bot: BotConfig
+    db: DatabaseConfig
+
 
 settings = Settings()
