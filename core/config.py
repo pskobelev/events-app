@@ -1,51 +1,39 @@
-from functools import lru_cache
-from logging import getLogger
-from pathlib import Path
+from pydantic import BaseModel, PostgresDsn
+from pydantic_settings import (
+    BaseSettings, SettingsConfigDict
+)
 
-from pydantic import PostgresDsn
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
-# Получаем путь к корню проекта, независимо от того, из какого файла запускается приложение
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-ENV_FILE = str(BASE_DIR / ".env")
-log = getLogger(__name__)
-
-class Config(BaseSettings):
-    model_config = SettingsConfigDict(env_file=ENV_FILE)
-
-    # DB
-    DB_USER: str
-    DB_PASS: str
-    DB_HOST: str
-    DB_PORT: str
-    DB_NAME: str
-
-    # Postgres
-    POSTGRES_DSN: str | PostgresDsn
-    # SQL ECHO
-    DEBUG: bool = True
-
-    # Bot
-    BOT_TOKEN: str
-    ADMINS_IDS: list[int] = []
-
-    # API
-    API_NAME: str = "Event App"
-    API_V1_STR: str = "/api/v1"
-    API_HOST: str
-    API_PORT: int
-
-    @property
-    def WEBHOOK_PATH(self) -> str:
-        return f"{self.API_V1_STR}/webhook"
-
-    @property
-    def API_PATH(self) -> str:
-        return f"http://{self.API_HOST}:{self.API_PORT}"
+LOG_DEFAULT_FORMAT = "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
 
 
-@lru_cache
-def get_config() -> Config:
-    log.info("Loading config.")
-    return Config()
+class RunConfig(BaseModel):
+    host: str = "0.0.0.0"
+    port: int = 8000
+
+
+class LoggingConfig(BaseModel):
+    log_format: str = LOG_DEFAULT_FORMAT
+
+
+class BotConfig(BaseModel):
+    token: str
+
+
+class DatabaseConfig(BaseModel):
+    url: PostgresDsn
+    echo: bool = True
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file="/Users/pskobelev/Developer/_PROJECTS/event_app/.env",
+        case_sensitive=False,
+    )
+
+    run: RunConfig = RunConfig()
+    logging: LoggingConfig = LoggingConfig()
+    bot: BotConfig = BotConfig(token="")
+    db: DatabaseConfig = DatabaseConfig(
+        url="postgresql+asyncpg://admin:qwe123@192.168.1.140:5432/events")
+
+settings = Settings()
