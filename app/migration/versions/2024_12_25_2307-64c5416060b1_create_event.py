@@ -1,8 +1,8 @@
-"""update tables
+"""create event
 
-Revision ID: 806d5e4d3be5
+Revision ID: 64c5416060b1
 Revises:
-Create Date: 2024-12-19 23:02:52.413667
+Create Date: 2024-12-25 23:07:33.492512
 
 """
 
@@ -11,8 +11,9 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
+
 # revision identifiers, used by Alembic.
-revision: str = "806d5e4d3be5"
+revision: str = "64c5416060b1"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -22,7 +23,7 @@ def upgrade() -> None:
     op.create_table(
         "events",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("chat_id", sa.Integer(), nullable=True),
+        sa.Column("chat_id", sa.BigInteger(), nullable=True),
         sa.Column("event_name", sa.String(), nullable=True),
         sa.Column("active", sa.Boolean(), nullable=False),
         sa.Column(
