@@ -14,6 +14,10 @@ class RunConfig(BaseModel):
     port: int = 8000
 
 
+class ApiConfig(BaseModel):
+    host: str = "0.0.0.0"
+    port: int = 8000
+
 class LoggingConfig(BaseModel):
     log_format: str = LOG_DEFAULT_FORMAT
 
@@ -39,6 +43,7 @@ class Settings(BaseSettings):
     logging: LoggingConfig = LoggingConfig()
     bot: BotConfig
     db: DatabaseConfig
+    api: ApiConfig = ApiConfig()
 
 
 settings = Settings()
