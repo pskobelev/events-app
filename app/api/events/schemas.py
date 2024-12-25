@@ -12,7 +12,7 @@ class EventBase(BaseModel):
     def parse_event_date(cls, value):
         if isinstance(value, str):
             # Преобразуем строку формата "YYYY-MM-DD HH:MM" в datetime
-            return datetime.strptime(value, "%Y-%m-%d %H:%M")
+            return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
         return value
 
     model_config = ConfigDict(from_attributes=True)
