@@ -3,14 +3,15 @@ from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
-    create_async_engine, AsyncSession, async_scoped_session,
+    create_async_engine,
+    AsyncSession,
+    async_scoped_session,
 )
 
-from app.core.config import get_config
+from core.config import settings
 
-# load config
-config = get_config()
 
+# load confi
 
 @dataclass
 class DatabaseHelper:
@@ -48,6 +49,6 @@ class DatabaseHelper:
 
 
 db_helper = DatabaseHelper(
-    url=config.POSTGRES_DSN,
-    echo=config.DEBUG,
+    url=str(settings.db.url),
+    echo=settings.db.echo,
 )
