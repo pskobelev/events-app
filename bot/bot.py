@@ -1,7 +1,7 @@
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramNetworkError
 
-from app.bot.handlers import user_router
+from bot import user_router
 from app.core.config import get_config
 from app.core.utils import configure_logging
 
