@@ -19,3 +19,4 @@ class UserEvent(Base):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.telegram_id"))
     event_id: Mapped[int] = mapped_column(ForeignKey("events.id"))
+    user_choice: Mapped[str] = mapped_column(String, nullable=True)
