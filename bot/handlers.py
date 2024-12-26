@@ -13,7 +13,8 @@ from aiogram_calendar import (
     SimpleCalendarCallback,
 )
 
-from api_service import api_add_new_event
+from api_service import api_add_new_event, api_write_user_choice, \
+    api_get_event_stats
 from core.config import settings
 
 logging.basicConfig(format=settings.logging.log_format, level=logging.DEBUG)
@@ -60,9 +61,10 @@ async def process_simple_calendar(
             logger.info("New event created successfully!")
 
         buttons = [
-            InlineKeyboardButton(text="Играю ⚽", callback_data="play"),
-            InlineKeyboardButton(text="Подумаю 🤔", callback_data="maybe"),
-            InlineKeyboardButton(text="Не могу 🙅‍♂️", callback_data="cannot"),
+            InlineKeyboardButton(text="Играю ⚽", callback_data="uc_play"),
+            InlineKeyboardButton(text="Подумаю 🤔", callback_data="uc_maybe"),
+            InlineKeyboardButton(text="Не могу 🙅‍♂️",
+                                 callback_data="uc_cannot"),
         ]
 
         inline_kb = InlineKeyboardMarkup(
@@ -75,24 +77,29 @@ async def process_simple_calendar(
         )
 
 
-cd_data = ['play', 'maybe', 'cannot']
-
-
 # <editor-fold desc="Callback for inline buttons">
-@user_router.callback_query(F.cd_data)
+@user_router.callback_query(F.data.startswith("uc_"))
 async def handle_game_buttons(callback_query: CallbackQuery):
     user_name = callback_query.from_user.full_name
+    user_id = callback_query.from_user.id
+    action = callback_query.data.split("_")[1]
+    params = {
+        "user_id":     user_id,
+        "event_id":    21,
+        "user_choice": action,
+    }
+    write_user = await api_write_user_choice(params=params)
+    logger.debug("User choice: %s", write_user)
+
+    event_users = await api_get_event_stats(event_id=21)
+    logger.debug("Event stats: %s", event_users)
 
     responses = {
         "play":   f"✅ {user_name} идет играть!",
         "maybe":  f"🤔 {user_name} подумает.",
         "cannot": f"❌ {user_name} не сможет прийти.",
     }
-
-    # Редактируем сообщение с новым текстом
-
-    await callback_query.message.edit_text('a',
-                                           reply_markup=callback_query.message.reply_markup)
+    # await callback_query.message.edit_text(responses[action], )
 
     # Уведомляем пользователя о выборе
     await callback_query.answer("Ваш выбор записан!")
