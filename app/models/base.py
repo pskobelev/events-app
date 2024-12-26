@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, func
+from sqlalchemy import DateTime, func, MetaData
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -9,6 +9,8 @@ from sqlalchemy.orm import (
     declared_attr,
     class_mapper,
 )
+
+from core.config import settings
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -25,6 +27,10 @@ class Base(AsyncAttrs, DeclarativeBase):
         DateTime(timezone=True),
         default=datetime.now,
         onupdate=datetime.now,
+    )
+
+    metadata = MetaData(
+        naming_convention=settings.db.convention,
     )
 
     # чтобы не придумывать названия таблиц, они будут создаваться от класса
