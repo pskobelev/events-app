@@ -18,10 +18,12 @@ async def api_add_new_event(params):
                     URL + "/events/add/",
                     json=params,
             ) as resp:
-                logger.debug("Send request: %s", resp.url)
                 try:
                     data = await handle_response(resp)
-                    return data
+                    event_data = await resp.json()
+                    event_id = event_data.get("id")
+                    logger.debug("Create new Event with ID: %s", event_id)
+                    return event_data
                 except ValueError as e:
                     logger.error("Catch exception: %s", e)
         except Exception as e:
@@ -30,8 +32,9 @@ async def api_add_new_event(params):
 
 async def api_write_user_choice(params):
     async with aiohttp.ClientSession() as session:
-        async with session.post(URL + "/events/user_choice/",
-                                json=params) as resp:
+        async with session.post(
+                URL + "/events/user_choice/", json=params
+        ) as resp:
             data = await handle_response(resp)
             return data
 
@@ -51,6 +54,7 @@ async def api_get_active_event(chat_id):
             data = await handle_response(resp)
             return data
 
+
 # region TODO: write fucking code
 async def is_active_game(chat_id):
     pass
@@ -58,4 +62,5 @@ async def is_active_game(chat_id):
 
 async def start_new_game(chat_id, message):
     pass
+
 # endregion
