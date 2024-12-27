@@ -22,10 +22,14 @@ async def get_active_events(session) -> dict:
     return result.scalars().first()
 
 
-async def set_close_event(session) -> None:
-    stmt = update(Event).where(Event.active == True).values(
-        active=False)  # noqa: E712
+async def set_close_event(chat_id, session) -> None:
+    stmt = (
+        update(Event)
+        .where(and_(Event.chat_id == chat_id, Event.active == True))
+        .values(active=False)
+    )  # noqa: E712
     await session.execute(stmt)
+    logger.debug("Event closed")
     await session.commit()
 
 

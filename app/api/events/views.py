@@ -3,8 +3,11 @@ import logging
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.events.crud import set_user_choice, crud_get_stats, \
-    crud_get_active_events
+from api.events.crud import (
+    set_user_choice,
+    crud_get_stats,
+    crud_get_active_events,
+)
 from api.events.schemas import CreateEvent
 from app.api.events.crud import (
     create_new_event,
@@ -36,12 +39,13 @@ async def get_events(
     return query
 
 
-@router.post("/close_event")
+@router.post("/close_event/{chat_id}")
 async def close_event(
+        chat_id: int,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    query = await set_close_event(session=session)
-    return {"status": "closed", **query}
+    await set_close_event(chat_id, session=session)
+    return {"status": "closed"}
 
 
 @router.delete("/events/{event_id}")
@@ -56,19 +60,18 @@ async def delete_event(
 @router.post("/user_choice/")
 async def user_choice(
         user_data: UserEventCreate,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency)):
-    query = await set_user_choice(
-        data=user_data, session=session
-    )
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    query = await set_user_choice(data=user_data, session=session)
     return query
 
 
 @router.get("/stats/{event_id}")
 async def get_stats(
         event_id: int,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency)):
-    query = await crud_get_stats(
-        event=event_id, session=session)
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    query = await crud_get_stats(event=event_id, session=session)
     return query
 
 

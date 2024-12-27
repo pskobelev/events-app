@@ -47,6 +47,14 @@ async def api_get_event_stats(event_id: int):
             return data
 
 
+async def api_close_active_event(chat_id):
+    logger.debug("Start close active event: %s", chat_id)
+    async with aiohttp.ClientSession() as session:
+        async with session.post(URL + f"/events/close_event/{chat_id}") as resp:
+            result = await handle_response(resp)
+            return result
+
+
 async def api_get_active_event(chat_id):
     logger.debug("Start get active event: %s", chat_id)
     async with aiohttp.ClientSession() as session:

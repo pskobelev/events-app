@@ -13,8 +13,12 @@ from aiogram_calendar import (
     SimpleCalendarCallback,
 )
 
-from api_service import api_add_new_event, api_write_user_choice, \
-    api_get_event_stats
+from api_service import (
+    api_add_new_event,
+    api_write_user_choice,
+    api_get_event_stats,
+    api_close_active_event,
+)
 from core.config import settings
 
 logging.basicConfig(format=settings.logging.log_format, level=logging.DEBUG)
@@ -32,6 +36,12 @@ async def process_text_command(message: Message):
             locale=await get_user_locale(message.from_user)
         ).start_calendar(),
     )
+
+
+@user_router.message(Command(commands=["close"]))
+async def process_close_command(message: Message):
+    chat_id = message.chat.id
+    await api_close_active_event(chat_id)
 
 
 @user_router.callback_query(SimpleCalendarCallback.filter())
