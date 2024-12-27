@@ -57,14 +57,19 @@ async def process_simple_calendar(
         }
         logger.info("User select date: %s, chat_id: %s", event_date, chat_id)
 
-        if await api_add_new_event(params=params):
+        new_event = await api_add_new_event(params=params)
+        if new_event:
             logger.info("New event created successfully!")
 
+        event_id = new_event.get("id")
+
         buttons = [
-            InlineKeyboardButton(text="Играю ⚽", callback_data="uc_play"),
-            InlineKeyboardButton(text="Подумаю 🤔", callback_data="uc_maybe"),
-            InlineKeyboardButton(text="Не могу 🙅‍♂️",
-                                 callback_data="uc_cannot"),
+            InlineKeyboardButton(
+                text="Играю ⚽", callback_data=f"uc_play:{event_id}"),
+            InlineKeyboardButton(
+                text="Подумаю 🤔", callback_data=f"uc_maybe:{event_id}"),
+            InlineKeyboardButton(
+                text="Не могу 🙅‍♂️", callback_data=f"uc_cannot:{event_id}"),
         ]
 
         inline_kb = InlineKeyboardMarkup(
@@ -82,16 +87,20 @@ async def process_simple_calendar(
 async def handle_game_buttons(callback_query: CallbackQuery):
     user_name = callback_query.from_user.full_name
     user_id = callback_query.from_user.id
-    action = callback_query.data.split("_")[1]
+
+    action, event_id = callback_query.data.split(":")
     params = {
         "user_id":     user_id,
-        "event_id":    21,
+        "event_id": int(event_id),
         "user_choice": action,
     }
-    write_user = await api_write_user_choice(params=params)
-    logger.debug("User choice: %s", write_user)
+    logger.debug("User choice: %s", params)
 
-    event_users = await api_get_event_stats(event_id=21)
+    write_user = await api_write_user_choice(params=params)
+
+    logger.debug("Write user choice: %s", write_user)
+
+    event_users = await api_get_event_stats(int(event_id))
     logger.debug("Event stats: %s", event_users)
 
     responses = {
