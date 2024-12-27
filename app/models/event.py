@@ -18,5 +18,6 @@ class UserEvent(Base):
     __table_args__ = {"extend_existing": True}
 
     user_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
+    username: Mapped[str] = mapped_column(String, nullable=True)
     event_id: Mapped[int] = mapped_column(ForeignKey("events.id"))
     user_choice: Mapped[str] = mapped_column(String, nullable=True)
