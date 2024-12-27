@@ -14,6 +14,7 @@ class Event(Base):
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     event_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
+
 class UserEvent(Base):
     __table_args__ = {"extend_existing": True}
 
