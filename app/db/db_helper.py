@@ -11,8 +11,6 @@ from sqlalchemy.ext.asyncio import (
 from core.config import settings
 
 
-# load confi
-
 @dataclass
 class DatabaseHelper:
     url: str
