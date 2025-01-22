@@ -16,8 +16,11 @@ class RunConfig(BaseModel):
 
 
 class ApiConfig(BaseModel):
+    prefix: str = "http://"
     host: str = "0.0.0.0"
     port: int = 8000
+    url: str
+
 
 class LoggingConfig(BaseModel):
     log_format: str = LOG_DEFAULT_FORMAT
@@ -44,7 +47,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=ENV_PATH,
         env_file_encoding="utf-8",
-        env_nested_delimiter="_",
+        env_nested_delimiter="__",
         case_sensitive=False,
     )
 
@@ -52,7 +55,10 @@ class Settings(BaseSettings):
     logging: LoggingConfig = LoggingConfig()
     bot: BotConfig
     db: DatabaseConfig
-    api: ApiConfig = ApiConfig()
+    api: ApiConfig
 
 
-settings = Settings()
+try:
+    settings = Settings()
+except Exception as e:
+    print(e)
