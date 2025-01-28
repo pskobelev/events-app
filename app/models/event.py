@@ -23,5 +23,6 @@ class UserEvent(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
     username: Mapped[str] = mapped_column(String, nullable=True)
     event_id: Mapped[int] = mapped_column(
-        ForeignKey("events.id", ondelete="CASCADE"))
+        ForeignKey("events.id", ondelete="CASCADE")
+    )
     user_choice: Mapped[str] = mapped_column(String, nullable=True)

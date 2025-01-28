@@ -7,13 +7,13 @@ class ApiRoutes:
 
     ADD_EVENT = "/add"
     LIST_EVENT = "/events"
-    CLOSE_EVENT = "/close/{chat_id}"
-    DELETE_EVENT = "/delete/{chat_id}"
-    FIND_EVENT = "/active/{chat_id}"
+    CLOSE_EVENT = "/close"
+    DELETE_EVENT = "/delete"
+    FIND_EVENT = "/active"  # find by chat_id, event_id over params
 
     USER_CHOICE = "/user_choice"
 
-    STATS = "/stats/{event_id}"
+    STATS = "/stats"  # find by event_id params
 
     @classmethod
     def get_full_url(cls, route: str, **kwargs):
