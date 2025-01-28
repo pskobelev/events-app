@@ -13,7 +13,7 @@ async def handle_response(resp):
     """
     if resp.status == 200:
         data = await resp.json()
-        return await format_text(data)
+        return data
     else:
         error_data = await resp.json()
         error_text = await format_text(error_data)

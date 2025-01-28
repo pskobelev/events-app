@@ -1,6 +1,5 @@
 import logging
 
-from fastapi import HTTPException
 from sqlalchemy import select, update, delete, and_
 
 from app.models import Event
@@ -19,13 +18,13 @@ async def create_new_event(event, session) -> Event:
 
 async def get_active_events(session) -> dict:
     result = await session.execute(select(Event).filter_by(active=True))
-    return result.scalars().first()
+    return result.scalars().all()
 
 
 async def set_close_event(chat_id, session) -> None:
     stmt = (
         update(Event)
-        .where(and_(Event.chat_id == chat_id, Event.active == True))
+        .where(and_(Event.chat_id == chat_id, Event.active is True))
         .values(active=False)
     )  # noqa: E712
     await session.execute(stmt)
@@ -35,14 +34,14 @@ async def set_close_event(chat_id, session) -> None:
 
 async def get_active_event(event_id, chat_id, session):
     stmt = select(Event).where(
-        chat_id=chat_id, event_id=event_id, session=session
+        and_(Event.chat_id == chat_id, Event.id == event_id)
     )
-    await session.execute(stmt)
-    await session.commit()
+    result = await session.execute(stmt)
+    return result.scalars().all()
 
 
-async def set_event_deleted(event_id, session):
-    smtp = delete(Event).where(event_id == event_id).values(active=False)
+async def set_delete_event(event_id: int, session):
+    smtp = delete(Event).where(Event.id == event_id)
     await session.execute(smtp)
     await session.commit()
 
@@ -69,7 +68,7 @@ async def set_user_choice(data, session):
     return user_dict or existing_user
 
 
-async def crud_get_stats(event, session):
+async def get_event_stat(event, session):
     query = select(UserEvent).where(UserEvent.event_id == event)
     result = await session.execute(query)
     result = result.scalars().all()

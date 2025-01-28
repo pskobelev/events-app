@@ -1,28 +1,31 @@
 import logging
 
 from fastapi import APIRouter, Depends
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.events.crud import (
     set_user_choice,
-    crud_get_stats,
-    crud_get_active_events,
+    get_event_stat,
+    get_active_events,
+    get_active_event,
+    set_delete_event,
+    set_close_event,
 )
-from api.events.schemas import CreateEvent
+from api.events.schemas import EventCreate
+from app.api.api_routes import ApiRoutes
 from app.api.events.crud import (
     create_new_event,
-    set_close_event,
-    set_event_deleted,
 )
 from app.api.events.schemas import EventBase, UserEventCreate
 from app.db.db_helper import db_helper
 from app.models import Event
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/events", tags=["events"])
+router = APIRouter(prefix=ApiRoutes.EVENT_BASE, tags=["events"])
 
 
-@router.post("/add/", response_model=CreateEvent)
+@router.post(ApiRoutes.ADD_EVENT, response_model=EventCreate)
 async def add_event(
         event_in: EventBase,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
@@ -31,15 +34,17 @@ async def add_event(
     return query
 
 
-@router.get("/events")
+@router.get(ApiRoutes.LIST_EVENT)
 async def get_events(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    query = await find_active_events(session=session)
+    query = await get_active_events(session=session)
+    if query is None:
+        raise HTTPException(status_code=404)
     return query
 
 
-@router.post("/close_event/{chat_id}")
+@router.post(ApiRoutes.CLOSE_EVENT)
 async def close_event(
         chat_id: int,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
@@ -48,16 +53,16 @@ async def close_event(
     return {"status": "closed"}
 
 
-@router.delete("/events/{event_id}")
+@router.delete(ApiRoutes.DELETE_EVENT)
 async def delete_event(
         event_id: int,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    query = await set_event_deleted(event_id, session=session)
-    return {"status": "deleted", **query}
+    await set_delete_event(event_id, session=session)
+    return {"status": "deleted"}
 
 
-@router.post("/user_choice/")
+@router.post(ApiRoutes.USER_CHOICE)
 async def user_choice(
         user_data: UserEventCreate,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
@@ -66,19 +71,22 @@ async def user_choice(
     return query
 
 
-@router.get("/stats/{event_id}")
+@router.get(ApiRoutes.STATS)
 async def get_stats(
         event_id: int,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    query = await crud_get_stats(event=event_id, session=session)
+    query = await get_event_stat(event=event_id, session=session)
     return query
 
 
-@router.get("/active_event/{chat_id}")
+@router.get(ApiRoutes.FIND_EVENT)
 async def find_active_events(
         chat_id: int,
+        event_id: int,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    query = await crud_get_active_events(chat_id, session=session)
+    query = await get_active_event(
+        chat_id=chat_id, event_id=event_id, session=session
+    )
     return query
