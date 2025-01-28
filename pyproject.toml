@@ -1,14 +1,17 @@
-[tool.poetry]
+[project]
 name = "event-app"
 version = "0.1.0"
 description = ""
-authors = ["Pavel Skobelev <pskobelev@me.com>"]
+authors = [
+    { name = "Pavel Skobelev", email = "pskobelev@me.com" }
+]
 readme = "README.md"
+requires-python = ">=3.12"
 
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.115.5"
-uvicorn = {extras = ["standart"], version = "^0.32.1"}
+uvicorn = { extras = ["standart"], version = "^0.32.1" }
 psycopg2-binary = "^2.9.10"
 python-dotenv = "^1.0.1"
 sqlalchemy = "^2.0.36"
@@ -16,12 +19,17 @@ pydantic = "^2.9.2"
 pydantic-settings = "^2.6.1"
 asyncpg = "^0.30.0"
 greenlet = "^3.1.1"
-ruff = "^0.8.0"
 alembic = "^1.14.0"
 aiogram = "^3.15.0"
+pytest-mock = "^3.14.0"
+pytest-asyncio = "^0.25.2"
+
+[tool.poetry.group.dev.dependencies]
 faker = "^33.1.0"
-pytest = "^8.3.4"
+ruff = "^0.8.0"
 mypy = "^1.13.0"
+pytest = "^8.3.4"
+
 
 [tool.ruff]
 line-length = 79
@@ -31,17 +39,6 @@ indent-width = 4
 quote-style = "double"
 indent-style = "space"
 
-#[tool.mypy]
-#mypy_path = '.app/'
-#follow_imports = "silent"
-#strict_optional = true
-#warn_redundant_casts = true
-#warn_unused_ignores = true
-#disallow_any_generics = true
-#check_untyped_defs = true
-#no_implicit_reexport = true
-
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
