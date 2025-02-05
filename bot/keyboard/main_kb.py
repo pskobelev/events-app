@@ -21,14 +21,10 @@ MENU_CMD = [
 async def set_user_choice_kb(event_id):
     buttons = [
         InlineKeyboardButton(
-            text="Играю ⚽", callback_data=f"uc_play:{event_id}"
-        ),
-        InlineKeyboardButton(
-            text="Подумаю 🤔", callback_data=f"uc_maybe:{event_id}"
-        ),
-        InlineKeyboardButton(
-            text="Не могу 🙅‍♂️", callback_data=f"uc_cannot:{event_id}"
-        ),
+            text=button["text"],
+            callback_data=f"uc_{button['choice']}:{event_id}",
+        )
+        for button in BUTTONS
     ]
     return InlineKeyboardMarkup(
         row_width=3, inline_keyboard=[buttons], resize_keyboard=True
