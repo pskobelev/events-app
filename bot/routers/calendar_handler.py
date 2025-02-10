@@ -16,12 +16,16 @@ from api_srv.api_service import (
     api_get_current_event,
     api_add_event,
 )
-from keyboard.main_kb import set_user_choice_kb
+from keyboard.user_choice_kb import (create_choice_keyboard, build_action_kb,
+                                     UserChoiceCbData)
 from utils.edit_event_message import edit_msg, format_date_with_day
 
 logger = logging.getLogger(__name__)
 
 router = Router(name=__name__)
+
+DATE_FROM = datetime(2025, 1, 1)
+DATE_TO = datetime(2025, 12, 31)
 
 
 @router.callback_query(SimpleCalendarCallback.filter())
@@ -32,7 +36,7 @@ async def show_calendar(
         locale=await get_user_locale(callback_query.from_user),
         show_alerts=True,
     )
-    calendar.set_dates_range(datetime(2025, 1, 1), datetime(2025, 12, 31))
+    calendar.set_dates_range(DATE_FROM, DATE_TO)
     selected, event_date = await calendar.process_selection(
         callback_query, callback_data
     )
@@ -43,25 +47,39 @@ async def show_calendar(
         new_event = await create_event(chat_id, event_date)
         event_id = new_event.get("id")
         date_with_day = await format_date_with_day(event_date.isoformat())
-        event_msg = new_event.get("event_name") + date_with_day
-        user_choice_kb = await set_user_choice_kb(event_id)
 
+        event_msg = new_event.get("event_name") + date_with_day
+        user_choice_kb = await create_choice_keyboard(event_id)
+
+        new_kb = build_action_kb()
         await callback_query.message.edit_text(
             event_msg,
-            reply_markup=user_choice_kb,
+            reply_markup=new_kb,
         )
 
 
-@router.callback_query(F.data.startswith("uc_"))
+@router.callback_query(UserChoiceCbData.filter())
+async def handle_user_choice(
+        callback_query: CallbackQuery,
+        callback_data: UserChoiceCbData
+):
+    await callback_query.answer(
+        text=(
+            f"You chose: {callback_data.choice}\n"
+            f"Callback {callback_query.data!r}")
+    )
+
+
+@router.callback_query(UserChoiceCbData.filter())
 async def handle_buttons(callback_query: CallbackQuery):
     user_name = callback_query.from_user.full_name
     user_id = callback_query.from_user.id
     action, event_id = callback_query.data.split(":")
-    logger.info("Start update message")
+    logger.debug("Start update message")
     params = {
-        "user_id":     user_id,
-        "username":    user_name,
-        "event_id":    int(event_id),
+        "user_id":  user_id,
+        "username": user_name,
+        "event_id": int(event_id),
         "user_choice": action,
     }
     set_user_choice = await api_write_user_choice(params=params)
@@ -79,15 +97,18 @@ async def handle_buttons(callback_query: CallbackQuery):
 
     # TODO: replace event_data > ev_date
     date_with_day = await format_date_with_day(ev_date)
-
     logger.debug("API_GET_CURRENT_EVENT: %s", date_with_day)
 
-    message_text = (
-            ev_name + date_with_day + "\n\n" + await edit_msg(event_data)
-    )
+    updated_msg = await edit_msg(event_data)
+    msg = {
+        "event_name": ev_name,
+        "event_date": date_with_day,
+    }
+
+    # msg = f"{ev_name} {date_with_day}\n\n{msg}"
 
     await callback_query.message.edit_text(
-        message_text,
+        **updated_msg.as_kwargs(),
         reply_markup=callback_query.message.reply_markup,
     )
 
@@ -96,7 +117,7 @@ async def create_event(chat_id, event_date, event_time=time(10, 30)):
     event_date = datetime.combine(event_date, event_time)
     params = {
         "event_name": "⚽ИГРАЕМ",
-        "chat_id":    chat_id,
+        "chat_id": chat_id,
         "event_date": event_date.isoformat(),
     }
     logger.debug("User select date: %s, chat_id: %s", event_date, chat_id)
