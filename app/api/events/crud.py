@@ -21,23 +21,23 @@ async def get_active_events(session) -> dict:
     return result.scalars().all()
 
 
-async def set_close_event(chat_id, session) -> None:
-    stmt = (
-        update(Event)
-        .where(and_(Event.chat_id == chat_id, Event.active is True))
-        .values(active=False)
-    )  # noqa: E712
-    await session.execute(stmt)
-    logger.debug("Event closed")
-    await session.commit()
-
-
 async def get_active_event(event_id, chat_id, session):
     stmt = select(Event).where(
         and_(Event.chat_id == chat_id, Event.id == event_id)
     )
     result = await session.execute(stmt)
     return result.scalars().all()
+
+
+async def set_close_event(chat_id, session) -> None:
+    stmt = (
+        update(Event)
+        .where(and_(Event.chat_id == chat_id, Event.active.is_(True)))
+        .values(active=False)
+    )  # noqa: E712
+    await session.execute(stmt)
+    logger.debug("Event closed")
+    await session.commit()
 
 
 async def set_delete_event(event_id: int, session):
@@ -72,10 +72,4 @@ async def get_event_stat(event, session):
     query = select(UserEvent).where(UserEvent.event_id == event)
     result = await session.execute(query)
     result = result.scalars().all()
-    return result
-
-
-async def crud_get_active_events(chat_id, session):
-    stmt = select(Event).where(Event.chat_id == chat_id)
-    result = (await session.execute(stmt)).scalars().all()
     return result
