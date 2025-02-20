@@ -3,13 +3,13 @@ from datetime import datetime
 
 from aiogram.utils.formatting import (
     Bold,
-    as_marked_section,
+    as_marked_section, Text,
 )
 
 logger = logging.getLogger(__name__)
 
 
-async def edit_msg(event_data):
+async def edit_msg(event_data) -> list:
     categories = {
         "Основной состав:": ("IN_GAME", "👟 "),
         "Скамейка:":        ("THINKING", "🔁 "),
@@ -26,7 +26,7 @@ async def edit_msg(event_data):
         if players:
             section = as_marked_section(
                 Bold(category_name), *players, marker=emoji
-            )
+            ).as_kwargs()
             content.append(section)
     logger.debug("CONTENT: %s", content)
     return content

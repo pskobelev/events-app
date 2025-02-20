@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 
 async def api_add_event(params):
     url = ApiRoutes.get_full_url(ApiRoutes.ADD_EVENT)
-    logger.info("Send req to: %s. With params: %s", url, params)
+    logger.debug("Send req to: %s. With params: %s", url, params)
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, json=params) as resp:
-                logger.info(f"Start new game response: {resp}")
+                logger.debug(f"Start new game response: {resp}")
                 try:
                     data = await handle_response(resp)
                     return data
@@ -25,21 +25,25 @@ async def api_add_event(params):
 
 async def api_write_user_choice(params):
     url = ApiRoutes.get_full_url(ApiRoutes.USER_CHOICE)
-    logger.info("Call ENDPOINT: %s", url)
+    logger.debug("Call ENDPOINT: %s. PARAMS: %s", url, params)
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=params) as resp:
             data = await handle_response(resp)
             return data
 
 
-async def api_get_event_stats(event_id: int):
+async def api_get_event_stats(event_id: int) -> dict:
+    """return stat of current event"""
     url = ApiRoutes.get_full_url(ApiRoutes.STATS)
     params = {"event_id": event_id}
-    logger.debug("Get event stats. url: %s, params: %s", url, params)
+    logger.debug("Call ENDPOINT: %s. PARAMS: %s", url, params)
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, params=params) as resp:
-            data = await handle_response(resp)
-            return data
+        try:
+            async with session.get(url, params=params) as resp:
+                data = await handle_response(resp)
+                return data
+        except ValueError as e:
+            raise ValueError from e
 
 
 async def api_get_all_events():
@@ -51,10 +55,10 @@ async def api_get_all_events():
             return data
 
 
-async def api_get_current_event(event_id: int, chat_id: int):
+async def api_get_current_event(event_id: int, chat_id: int) -> list:
     url = ApiRoutes.get_full_url(ApiRoutes.FIND_EVENT)
     params = {"event_id": event_id, "chat_id": chat_id}
-    logger.debug("Get current event. url: %s, params: %s", url, params)
+    logger.debug("Call ENDPOINT: %s. PARAMS: %s", url, params)
     async with aiohttp.ClientSession() as session:
         async with session.get(url, params=params) as resp:
             data = await handle_response(resp)
@@ -62,7 +66,7 @@ async def api_get_current_event(event_id: int, chat_id: int):
                 logger.warning(
                     "Empty response for event_id=%s and chat_id=%s",
                     event_id,
-                    chat_id
+                    chat_id,
                 )
             return data
 
@@ -70,7 +74,7 @@ async def api_get_current_event(event_id: int, chat_id: int):
 async def api_close_active_event(chat_id):
     url = ApiRoutes.get_full_url(ApiRoutes.CLOSE_EVENT)
     params = {"chat_id": chat_id}
-    logger.debug("Call url: %s with params: %s", url, params)
+    logger.debug("Call ENDPOINT: %s. PARAMS: %s", url, params)
     async with aiohttp.ClientSession() as session:
         async with session.post(url, params=params) as resp:
             result = await handle_response(resp)
