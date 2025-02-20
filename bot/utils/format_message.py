@@ -3,8 +3,7 @@ from datetime import datetime
 
 from aiogram.utils.formatting import (
     Bold,
-    as_marked_section, Text,
-)
+    as_marked_section, )
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.users.crud import (
-    get_all_users, create_new_user,
+    get_all_users,
+    create_new_user,
 )
 from api.users.schemas import ViewUser, UserBase
 from core.utils import configure_logging
@@ -14,16 +15,20 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/all_users", response_model=list[ViewUser])
 async def get_users(
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency)):
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
     return await get_all_users(session=session)
 
 
-@router.post("/add/", response_model=ViewUser,
-             status_code=status.HTTP_201_CREATED,
-             )
-async def add_user(user_in: UserBase,
-                   session: AsyncSession = Depends(
-                       db_helper.scoped_session_dependency)):
+@router.post(
+    "/add/",
+    response_model=ViewUser,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_user(
+        user_in: UserBase,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
     new_user = await create_new_user(user_in=user_in, session=session)
     return new_user
 

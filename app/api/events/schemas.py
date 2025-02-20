@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict
 
 
 class EventBase(BaseModel):
@@ -11,7 +11,11 @@ class EventBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class CreateEvent(EventBase):
+class EventCreate(EventBase):
+    id: int
+
+
+class EventView(EventBase):
     id: int
 
 
