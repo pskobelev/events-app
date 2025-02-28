@@ -21,7 +21,7 @@ async def start_event(message: Message):
     locale = await get_user_locale(message.from_user)
     calendar_kb = await SimpleCalendar(locale=locale).start_calendar()
     await message.answer(
-        text='Когда игра?',
+        text="Когда игра?",
         reply_markup=calendar_kb,
     )
 
@@ -31,7 +31,9 @@ async def close_events(message: Message):
     chat_id = message.chat.id
     logger.debug("Try close in chat, %s", chat_id)
     await api_close_active_event(chat_id)
+    # TODO EB-49
     await message.answer("Активных событий нет.")
+
 
 
 @router.message(Command(commands=["list"]))
@@ -39,9 +41,7 @@ async def show_events(message: Message):
     games = await api_get_all_events()
     logger.debug("Got games %s", [g for g in games])
     if games:
-        await message.answer(
-            text=f"Есть {len(games)} игр.")
+        await message.answer(text=f"Есть {len(games)} игр.")
 
     else:
-        await message.answer(
-            text="Активных событий нет ✅")
+        await message.answer(text="Активных событий нет ✅")

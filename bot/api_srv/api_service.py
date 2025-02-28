@@ -24,6 +24,7 @@ async def api_add_event(params):
 
 
 async def api_write_user_choice(params):
+    """write user choice to database"""
     url = ApiRoutes.get_full_url(ApiRoutes.USER_CHOICE)
     logger.debug("Call ENDPOINT: %s. PARAMS: %s", url, params)
     async with aiohttp.ClientSession() as session:
