@@ -12,6 +12,7 @@ class Event(Base):
     chat_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
     event_name: Mapped[str] = mapped_column(String, nullable=True)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
+    minimum_participants: Mapped[int] = mapped_column(BigInteger, default=10, nullable=True)
     event_date: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=True
     )
