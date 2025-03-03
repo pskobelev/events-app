@@ -17,14 +17,15 @@ async def create_new_event(event, session) -> Event:
 
 
 async def get_active_events(session) -> dict:
+    """ return all active events in database """
     result = await session.execute(select(Event).filter_by(active=True))
     return result.scalars().all()
 
 
 async def get_active_event(event_id, chat_id, session):
     stmt = select(Event).where(
-        and_(Event.chat_id == chat_id, Event.id == event_id)
-    )
+        and_(Event.chat_id == chat_id,
+             Event.id == event_id))
     result = await session.execute(stmt)
     return result.scalars().all()
 
@@ -48,13 +49,13 @@ async def set_delete_event(event_id: int, session):
 
 async def set_user_choice(data, session):
     user_dict = UserEvent(**(data.model_dump()))
-    query = select(UserEvent).where(
+    stmt = select(UserEvent).where(
         and_(
             UserEvent.user_id == user_dict.user_id,
             UserEvent.event_id == user_dict.event_id,
         )
     )
-    existing_user = (await session.execute(query)).scalar()
+    existing_user = (await session.execute(stmt)).scalar()
     if existing_user:
         logger.debug("OLD CHOICE: %s", existing_user.user_choice)
         logger.debug("NEW CHOICE: %s", user_dict.user_choice)
@@ -69,7 +70,16 @@ async def set_user_choice(data, session):
 
 
 async def get_event_stat(event, session):
-    query = select(UserEvent).where(UserEvent.event_id == event)
-    result = await session.execute(query)
+    stmt = select(UserEvent).where(UserEvent.event_id == event)
+    result = await session.execute(stmt)
     result = result.scalars().all()
     return result
+
+
+async def set_minimum_players(chat_id, limit, session):
+    stmt = update(Event).where(
+        Event.id == chat_id).values(
+        minimum_players=limit
+    )
+    await session.execute(stmt)
+    await session.commit()
