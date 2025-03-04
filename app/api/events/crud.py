@@ -17,17 +17,23 @@ async def create_new_event(event, session) -> Event:
 
 
 async def get_active_events(session) -> dict:
-    """ return all active events in database """
+    """return all active events in database"""
     result = await session.execute(select(Event).filter_by(active=True))
     return result.scalars().all()
 
 
 async def get_active_event(event_id, chat_id, session):
     stmt = select(Event).where(
-        and_(Event.chat_id == chat_id,
-             Event.id == event_id))
+        and_(Event.chat_id == chat_id, Event.id == event_id)
+    )
     result = await session.execute(stmt)
     return result.scalars().all()
+
+
+async def update_event(event_id: int, session, **kwargs):
+    stmt = update(Event).where(Event.id == event_id).values(**kwargs)
+    await session.execute(stmt)
+    await session.commit()
 
 
 async def set_close_event(chat_id, session) -> None:
@@ -77,9 +83,8 @@ async def get_event_stat(event, session):
 
 
 async def set_minimum_players(chat_id, limit, session):
-    stmt = update(Event).where(
-        Event.id == chat_id).values(
-        minimum_players=limit
+    stmt = (
+        update(Event).where(Event.id == chat_id).values(minimum_players=limit)
     )
     await session.execute(stmt)
     await session.commit()
