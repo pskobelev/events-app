@@ -25,32 +25,52 @@ async def update_event_message(callback_query: CallbackQuery, event_id: int):
     event_data = await fetch_event_data(event_id)
     if not event_data:
         await handle_missing_event(callback_query)
-        return None
+        return ""
 
     message = await update_footer_msg(event_data)
     return message
 
 
 async def update_footer_msg(event_data):
-    categories = {
-        "Основной состав:": ("IN_GAME", "👟 "),
-        "Скамейка:":   ("THINKING", "🔁 "),
-        "Отказались:": ("PASS", "❌ "),
-    }
     content = Text()
-    # todo: изменить логику, тк сейчас не обрабатывается случай, когда на игру установлено минимальное число игроков
-    # если количество игроков набирается, то остальные должны попадать в секцию "скамейка"
-    for category, (status, emoji) in categories.items():
-        players = [
-            player.get("username", "Unknown")
-            for player in event_data
-            if player.get("user_choice") == status
-        ]
-        if players:
-            section = as_section(
-                Bold(f"{emoji}{category}"), as_numbered_list(*players), "\n\n"
-            )
-            content = Text(content, section)
+    min_players = next(
+        (item.get("minimum_participants", 10) for item in event_data), 10
+    )
+
+    in_game_players = [
+        player.get("username", "Unknown")
+        for player in event_data
+        if player.get("user_choice") == "IN_GAME"
+    ]
+
+    main_squad = in_game_players[:min_players]
+    bench = in_game_players[min_players:]
+
+    if main_squad:
+        section = as_section(
+            Bold("👟 Основной состав:"), as_numbered_list(*main_squad), "\n\n"
+        )
+        content = Text(content, section)
+
+    if bench:
+        section = as_section(
+            Bold("🔄 Скамейка:"), as_numbered_list(*bench), "\n\n"
+        )
+        content = Text(content, section)
+
+    pass_players = []
+    for player in event_data:
+        if player.get("user_choice") == "PASS":
+            name = player.get("username", "Unknown")
+            date = await fmt_date_time(player.get("updated_at"))
+            pass_players.append(f"{name} 🗓️️{date}")
+
+    if pass_players:
+        section = as_section(
+            Bold("❌ Отказались:"), as_numbered_list(*pass_players), "\n\n"
+        )
+        content = Text(content, section)
+
     logger.debug("CONTENT as_kwargs(): %s", content.as_kwargs())
 
     return content
@@ -76,5 +96,10 @@ async def handle_missing_event(callback_query: CallbackQuery):
 
 async def format_date_with_day(event_date):
     date = datetime.fromisoformat(event_date)
-    date_with_day = f"🗓️ {date.date().isoformat()} ({date.strftime('%A')})"
+    date_with_day = f'🗓️ {date.date().isoformat()} ({date.strftime('%A')})'
     return date_with_day
+
+
+async def fmt_date_time(event_date) -> str:
+    date = datetime.fromisoformat(event_date)
+    return date.ctime()
