@@ -2,13 +2,13 @@ import logging
 from datetime import datetime
 
 from aiogram import Router
+from aiogram.enums import ParseMode
 from aiogram.types import CallbackQuery
 from aiogram_calendar import (
     SimpleCalendar,
     SimpleCalendarCallback,
     get_user_locale,
 )
-from aiogram.enums import ParseMode
 
 from api_srv.api_service import (
     api_get_current_event,
@@ -27,7 +27,7 @@ DATE_TO = datetime(2025, 12, 31)
 
 @router.callback_query(SimpleCalendarCallback.filter())
 async def handle_calendar(
-        callback_query: CallbackQuery, callback_data: SimpleCalendarCallback
+    callback_query: CallbackQuery, callback_data: SimpleCalendarCallback
 ):
     """Show calendar for User"""
     calendar = SimpleCalendar(
@@ -55,10 +55,10 @@ async def handle_calendar(
 
 @router.callback_query(UserChoiceCbData.filter())
 async def handle_user_choice(
-        callback_query: CallbackQuery, callback_data: UserChoiceCbData
+    callback_query: CallbackQuery, callback_data: UserChoiceCbData
 ):
     """Handle user choice and write it to DB"""
-
+    logger.debug("ENTER CALLBACK UserChoice")
     user_name = callback_query.from_user.full_name
     user_id = callback_query.from_user.id
     choice = callback_data.choice
@@ -66,18 +66,14 @@ async def handle_user_choice(
     chat_id = callback_query.message.chat.id
 
     params = {
-        "user_id":  user_id,
-        "username": user_name,
+        "user_id": user_id,
         "event_id": event_id,
+        "username": user_name,
         "user_choice": choice,
     }
-
     is_active = await api_get_current_event(event_id, chat_id)
-
     if is_active[0].get("active"):
-        logger.debug("Current event: %s is active %s", event_id, is_active)
-
-        set_user_choice = await api_write_user_choice(params=params)
+        set_user_choice = await api_write_user_choice(params)
         logger.debug("Write user choice to DB: %s", set_user_choice)
         event_kb = build_action_kb(event_id)
 
@@ -89,9 +85,9 @@ async def handle_user_choice(
         footer_text = (
             await update_event_message(callback_query, event_id)
         ).as_html()
-        logger.debug("updated as string: %s", footer_text)
+        # logger.debug("updated as string: %s", footer_text)
 
-        full_text = f"{event_title} {event_formated_date}\n\n{footer_text}"
+        full_text = f"{event_title}\n{event_formated_date}\n\n{footer_text}"
         try:
             await callback_query.message.edit_text(
                 full_text,

@@ -7,7 +7,11 @@ from aiogram.types import (
 )
 from aiogram_calendar import SimpleCalendar, get_user_locale
 
-from api_srv.api_service import api_get_all_events, api_close_active_event
+from api_srv.api_service import (
+    api_get_all_events,
+    api_close_active_event,
+    api_set_event_limit,
+)
 from core.config import settings
 
 logging.basicConfig(level=logging.DEBUG, format=settings.logging.log_format)
@@ -31,9 +35,9 @@ async def close_events(message: Message):
     chat_id = message.chat.id
     logger.debug("Try close in chat, %s", chat_id)
     await api_close_active_event(chat_id)
-    # TODO EB-49
-    await message.answer("Активных событий нет.")
+    # TODO EV-10
 
+    await message.answer("Активных событий нет.")
 
 
 @router.message(Command(commands=["list"]))
@@ -45,3 +49,13 @@ async def show_events(message: Message):
 
     else:
         await message.answer(text="Активных событий нет ✅")
+
+
+@router.message(Command(commands=["limit"]))
+async def set_event_limit(message: Message):
+    limit = int(message.text.split(" ")[1])
+    chat_id = message.chat.id
+    if await api_set_event_limit(chat_id, limit):
+        await message.answer(f"Минимальное количество игроков: {limit}")
+    else:
+        await message.answer("Не указано минимальное число игроков")

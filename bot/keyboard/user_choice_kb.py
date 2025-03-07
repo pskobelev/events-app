@@ -28,6 +28,7 @@ def build_action_kb(event_id: int) -> InlineKeyboardMarkup:
     # builder.adjust(1)
     return builder.as_markup()
 
+
 # async def create_choice_keyboard(event_id: int) -> InlineKeyboardMarkup:
 #     buttons = [
 #         InlineKeyboardButton(

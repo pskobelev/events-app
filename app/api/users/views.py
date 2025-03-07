@@ -15,7 +15,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/all_users", response_model=list[ViewUser])
 async def get_users(
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     return await get_all_users(session=session)
 
@@ -26,11 +26,12 @@ async def get_users(
     status_code=status.HTTP_201_CREATED,
 )
 async def add_user(
-        user_in: UserBase,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    user_in: UserBase,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     new_user = await create_new_user(user_in=user_in, session=session)
     return new_user
+
 
 # @router.get("/{telegram_id}", response_model=list[ViewUser])
 # async def get_user(telegram_id: int, session):

@@ -29,7 +29,7 @@ async def extract_datetime(text):
     if match:
         date_part = match.group(1)  # Всегда есть дата
         time_part = (
-                match.group(2) or "10:30"
+            match.group(2) or "10:30"
         )  # Подставляем стандартное время, если его нет
         datetime_str = f"{date_part} {time_part}"
         try:

@@ -1,7 +1,7 @@
 import os
 from typing import ClassVar
 
-from pydantic import BaseModel, PostgresDsn, ValidationError
+from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # LOG_DEFAULT_FORMAT = "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"

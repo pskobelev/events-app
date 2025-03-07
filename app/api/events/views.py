@@ -11,6 +11,7 @@ from api.events.crud import (
     get_active_event,
     set_delete_event,
     set_close_event,
+    set_minimum_players,
 )
 from api.events.schemas import EventCreate
 from app.api.api_routes import ApiRoutes
@@ -27,8 +28,8 @@ router = APIRouter(prefix=ApiRoutes.EVENT_BASE, tags=["events"])
 
 @router.post(ApiRoutes.ADD_EVENT, response_model=EventCreate)
 async def add_event(
-        event_in: EventBase,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    event_in: EventBase,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> Event:
     query = await create_new_event(event=event_in, session=session)
     return query
@@ -36,7 +37,7 @@ async def add_event(
 
 @router.get(ApiRoutes.LIST_EVENT)
 async def get_events(
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     query = await get_active_events(session=session)
     if query is None:
@@ -46,17 +47,17 @@ async def get_events(
 
 @router.post(ApiRoutes.CLOSE_EVENT)
 async def close_event(
-        chat_id: int,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    chat_id: int,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     await set_close_event(chat_id, session=session)
-    return {"status": "closed"}
+    return {"chat_id": chat_id, "status": "closed"}
 
 
 @router.delete(ApiRoutes.DELETE_EVENT)
 async def delete_event(
-        event_id: int,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    event_id: int,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     await set_delete_event(event_id, session=session)
     return {"status": "deleted"}
@@ -64,8 +65,8 @@ async def delete_event(
 
 @router.post(ApiRoutes.USER_CHOICE)
 async def user_choice(
-        user_data: UserEventCreate,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    user_data: UserEventCreate,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     query = await set_user_choice(data=user_data, session=session)
     return query
@@ -73,8 +74,8 @@ async def user_choice(
 
 @router.get(ApiRoutes.STATS)
 async def get_stats(
-        event_id: int,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    event_id: int,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     query = await get_event_stat(event=event_id, session=session)
     return query
@@ -82,11 +83,23 @@ async def get_stats(
 
 @router.get(ApiRoutes.FIND_EVENT)
 async def find_active_events(
-        chat_id: int,
-        event_id: int,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    chat_id: int,
+    event_id: int,
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     query = await get_active_event(
         chat_id=chat_id, event_id=event_id, session=session
     )
     return query
+
+
+# @router.post(ApiRoutes.LIMIT)
+# async def set_limit_event(
+#     chat_id: int,
+#     limit: int,
+#     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+# ) -> dict[str:str]:
+#     query = await set_minimum_players(
+#         chat_id=chat_id, limit=limit, session=session
+#     )
+#     return query

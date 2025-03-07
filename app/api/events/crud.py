@@ -55,6 +55,7 @@ async def set_delete_event(event_id: int, session):
 
 async def set_user_choice(data, session):
     user_dict = UserEvent(**(data.model_dump()))
+    logger.debug("USER_DICT: %s", user_dict)
     stmt = select(UserEvent).where(
         and_(
             UserEvent.user_id == user_dict.user_id,
