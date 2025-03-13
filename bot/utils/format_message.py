@@ -9,7 +9,7 @@ from aiogram.utils.formatting import (
     as_section,
 )
 
-from api_srv.api_service import api_get_event_stats
+from api_serv.api_service import api_get_event_stats
 
 logger = logging.getLogger(__name__)
 

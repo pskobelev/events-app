@@ -1,7 +1,7 @@
 import sys
 from os.path import dirname, abspath
 
-from core.config import settings
+from config import settings
 from app.models import Base
 
 sys.path.insert(0, dirname(dirname(abspath(__file__))))

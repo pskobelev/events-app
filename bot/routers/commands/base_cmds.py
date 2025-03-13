@@ -2,12 +2,14 @@ import logging
 import random
 from datetime import time, datetime
 
-from api_srv.api_service import api_add_event
+from api_serv.api_service import api_add_event
 
 logger = logging.getLogger(__name__)
 
 
-async def create_event(chat_id, event_date, event_time=time(10, 30)):
+async def create_event(
+    chat_id, event_date, event_time=time(10, 30)
+) -> dict[str, str]:
     event_date = datetime.combine(event_date, event_time)
     game_name = f"⚽{get_random_football_name()}"
     params = {

@@ -1,4 +1,4 @@
-from core.config import settings
+from src.config import settings
 
 
 class ApiRoutes:

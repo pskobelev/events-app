@@ -4,23 +4,22 @@ from fastapi import APIRouter, Depends
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.events.crud import (
+from src.api.events.crud import (
     set_user_choice,
     get_event_stat,
     get_active_events,
     get_active_event,
     set_delete_event,
     set_close_event,
-    set_minimum_players,
 )
-from api.events.schemas import EventCreate
-from app.api.api_routes import ApiRoutes
-from app.api.events.crud import (
+from src.api.events.schemas import EventCreate
+from src.api.api_routes import ApiRoutes
+from src.api.events.crud import (
     create_new_event,
 )
-from app.api.events.schemas import EventBase, UserEventCreate
-from app.db.db_helper import db_helper
-from app.models import Event
+from src.api.events.schemas import EventBase, UserEventCreate
+from src.db.db_helper import db_helper
+from src.models import Event
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix=ApiRoutes.EVENT_BASE, tags=["events"])

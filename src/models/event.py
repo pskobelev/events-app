@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import String, Boolean, ForeignKey, BigInteger, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models import Base
+from src.models import Base
 
 
 class Event(Base):

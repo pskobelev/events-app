@@ -1,7 +1,8 @@
 import logging
 
 from aiogram.client.session import aiohttp
-from app.api.api_routes import ApiRoutes
+
+from src.api.api_routes import ApiRoutes
 from utils.mods import handle_response
 
 logger = logging.getLogger(__name__)

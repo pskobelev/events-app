@@ -18,7 +18,7 @@ class UserChoiceCbData(CallbackData, prefix="user-choice"):
     choice: str
 
 
-def build_action_kb(event_id: int) -> InlineKeyboardMarkup:
+def build_action_kb(event_id, user_id) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for action in UserChoice:
         callback_data = UserChoiceCbData(
@@ -26,17 +26,12 @@ def build_action_kb(event_id: int) -> InlineKeyboardMarkup:
         ).pack()
         builder.button(text=action.value, callback_data=callback_data)
     # builder.adjust(1)
+    if user_id == 722445:
+        builder.button(text="Закрыть игру", callback_data="close_event")
     return builder.as_markup()
 
 
-# async def create_choice_keyboard(event_id: int) -> InlineKeyboardMarkup:
-#     buttons = [
-#         InlineKeyboardButton(
-#             text=text, callback_data=f"uc_{choice}:{event_id}"
-#         )
-#         for choice, text in USER_CHOICES.items()
-#     ]
-#
-#     return InlineKeyboardMarkup(
-#         inline_keyboard=[buttons], row_width=3, resize_keyboard=True
-#     )
+def build_admin_kb() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Закрыть игру", callback_data="close_event")
+    return builder.as_markup()

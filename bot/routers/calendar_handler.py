@@ -10,7 +10,7 @@ from aiogram_calendar import (
     get_user_locale,
 )
 
-from api_srv.api_service import (
+from api_serv.api_service import (
     api_get_current_event,
     api_write_user_choice,
 )
@@ -37,10 +37,11 @@ async def handle_calendar(
     selected, event_date = await calendar.process_selection(
         callback_query, callback_data
     )
-
+    logger.debug("Message ID is: %s", callback_query.message.message_id)
     if selected:
         new_event = await create_event(
-            callback_query.message.chat.id, event_date
+            callback_query.message.chat.id,
+            event_date,
         )
         event_id = new_event.get("id")
         date_with_day = await format_date_with_day(event_date.isoformat())
@@ -75,7 +76,8 @@ async def handle_user_choice(
     if is_active[0].get("active"):
         set_user_choice = await api_write_user_choice(params)
         logger.debug("Write user choice to DB: %s", set_user_choice)
-        event_kb = build_action_kb(event_id)
+        logger.debug("User ID: %s", user_id)
+        event_kb = build_action_kb(event_id, user_id)
 
         event_date = is_active[0].get("event_date", 0)
         event_formated_date = await format_date_with_day(event_date)

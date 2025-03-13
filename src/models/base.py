@@ -10,7 +10,7 @@ from sqlalchemy.orm import (
     class_mapper,
 )
 
-from core.config import settings
+from src.config import settings
 
 
 class Base(AsyncAttrs, DeclarativeBase):

@@ -1,18 +1,18 @@
 import logging
 
-from aiogram import Router
+from aiogram import Router, Bot
 from aiogram.filters import Command
 from aiogram.types import (
     Message,
 )
 from aiogram_calendar import SimpleCalendar, get_user_locale
 
-from api_srv.api_service import (
+from api_serv.api_service import (
     api_get_all_events,
     api_close_active_event,
     api_set_event_limit,
 )
-from core.config import settings
+from src.config import settings
 
 logging.basicConfig(level=logging.DEBUG, format=settings.logging.log_format)
 logger = logging.getLogger(__name__)
@@ -22,7 +22,9 @@ router = Router(name=__name__)
 
 @router.message(Command(commands=["new_game"]))
 async def start_event(message: Message):
-    locale = await get_user_locale(message.from_user)
+    locale = (
+        await get_user_locale(message.from_user) if message.from_user else "ru"
+    )
     calendar_kb = await SimpleCalendar(locale=locale).start_calendar()
     await message.answer(
         text="Когда игра?",
@@ -31,13 +33,18 @@ async def start_event(message: Message):
 
 
 @router.message(Command(commands=["close"]))
-async def close_events(message: Message):
+async def close_events(message: Message, bot: Bot):
     chat_id = message.chat.id
     logger.debug("Try close in chat, %s", chat_id)
     await api_close_active_event(chat_id)
-    # TODO EV-10
 
-    await message.answer("Активных событий нет.")
+    original_text = "Foo"
+
+    new_text = f"Завершено {original_text}"
+
+    await bot.edit_message_text(
+        chat_id=chat_id, message_id=msg_id, text=new_text
+    )
 
 
 @router.message(Command(commands=["list"]))

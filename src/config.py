@@ -1,5 +1,5 @@
-import os
 from typing import ClassVar
+from pathlib import Path
 
 from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -9,8 +9,7 @@ LOG_DEFAULT_FORMAT = (
     "[%(asctime)s] %(levelname)-7s| %(module)10s:%(lineno)-3d - %(message)s"
 )
 # Вычисляем абсолютный путь к .env
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENV_PATH = os.path.join(BASE_DIR, ".env")
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class RunConfig(BaseModel):
@@ -48,7 +47,7 @@ class DatabaseConfig(BaseModel):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=ENV_PATH,
+        env_file=(BASE_DIR / ".env"),
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
         case_sensitive=False,

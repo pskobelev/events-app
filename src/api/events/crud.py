@@ -2,8 +2,8 @@ import logging
 
 from sqlalchemy import select, update, delete, and_
 
-from app.models import Event
-from models import UserEvent
+from src.models import Event
+from src.models import UserEvent
 
 logger = logging.getLogger(__name__)
 
