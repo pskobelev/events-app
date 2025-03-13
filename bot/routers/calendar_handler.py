@@ -48,7 +48,9 @@ async def handle_calendar(
         event_msg = new_event.get("event_name") + date_with_day
 
         # Показываем кнопки для голосования
-        event_kb = build_action_kb(event_id)
+        event_kb = build_action_kb(
+            event_id, callback_query.message.from_user.id
+        )
         await callback_query.message.edit_text(
             event_msg, reply_markup=event_kb
         )
