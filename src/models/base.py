@@ -13,7 +13,7 @@ from sqlalchemy.orm import (
 from src.config import settings
 
 
-class Base(AsyncAttrs, DeclarativeBase):
+class BaseEvent(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)

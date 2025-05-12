@@ -3,10 +3,10 @@ from datetime import datetime
 from sqlalchemy import String, Boolean, ForeignKey, BigInteger, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.models import Base
+from src.models import BaseEvent
 
 
-class Event(Base):
+class Event(BaseEvent):
     __table_args__ = {"extend_existing": True}
 
     chat_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
@@ -20,7 +20,7 @@ class Event(Base):
     )
 
 
-class UserEvent(Base):
+class UserEvent(BaseEvent):
     __table_args__ = {"extend_existing": True}
 
     user_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
