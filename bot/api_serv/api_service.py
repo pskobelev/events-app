@@ -71,9 +71,9 @@ async def api_get_current_event(event_id: int, chat_id: int) -> list:
             return data
 
 
-async def api_close_active_event(chat_id):
+async def api_close_active_event(chat_id: int):
     url = ApiRoutes.get_full_url(ApiRoutes.CLOSE_EVENT.format(chat_id=chat_id))
-    logger.debug("Call ENDPOINT: %s. PARAMS: %s", url)
+    logger.debug("Call ENDPOINT: %s", url)
     async with aiohttp.ClientSession() as session:
         async with session.post(url) as resp:
             result = await handle_response(resp)
@@ -88,7 +88,5 @@ async def api_set_event_limit(chat_id: int, limit: int) -> None:
         async with session.post(url, params=params) as resp:
             result = await handle_response(resp)
             if not result:
-                logger.warning(
-                    "Empty response for event_id=%s and chat_id=%s",
-                )
+                logger.warning("Empty response for chat_id=%s", chat_id)
             return result

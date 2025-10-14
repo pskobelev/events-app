@@ -13,16 +13,12 @@ logging.basicConfig(level=logging.DEBUG, format=settings.logging.log_format)
 logger = logging.getLogger(__name__)
 
 
-async def set_commands(bot: Bot):
-    await bot.set_my_commands(MENU_COMMANDS)
-
-
 async def main():
     dp = Dispatcher()
     dp.include_router(main_router)
     bot = Bot(token=settings.bot.token)
 
-    await set_commands(bot)
+    await bot.set_my_commands(MENU_COMMANDS)
     await dp.start_polling(bot)
 
 
