@@ -1,14 +1,16 @@
-from typing import ClassVar
 from pathlib import Path
+from typing import ClassVar, Optional
 
-from pydantic import BaseModel, PostgresDsn
+from pydantic import (
+    BaseModel,
+    PostgresDsn,
+)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# LOG_DEFAULT_FORMAT = "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
+
 LOG_DEFAULT_FORMAT = (
     "[%(asctime)s] %(levelname)-7s| %(module)10s:%(lineno)-3d - %(message)s"
 )
-# Вычисляем абсолютный путь к .env
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -18,31 +20,36 @@ class RunConfig(BaseModel):
 
 
 class ApiConfig(BaseModel):
-    prefix: str = "http://"
+    prefix: str = "https://"
     host: str = "0.0.0.0"
     port: int = 8000
-    url: str
+    url: str = ""
 
 
 class LoggingConfig(BaseModel):
     log_format: str = LOG_DEFAULT_FORMAT
+    log_level: str = "DEBUG"
 
 
 class BotConfig(BaseModel):
-    token: str
+    token: str = ""
 
 
 class DatabaseConfig(BaseModel):
-    url: PostgresDsn
+    url: Optional[PostgresDsn] = None
     echo: bool = True
 
-    convention: ClassVar[dict] = {
+    convention: ClassVar[dict] = {  # type: ignore
         "ix": "ix_%(column_0_label)s",
         "uq": "uq_%(table_name)s_%(column_0_name)s",
         "ck": "ck_%(table_name)s_%(constraint_name)s",
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
         "pk": "pk_%(table_name)s",
     }
+
+
+class TGAdmins(BaseModel):
+    admins: list[int] = []
 
 
 class Settings(BaseSettings):
@@ -59,9 +66,15 @@ class Settings(BaseSettings):
     bot: BotConfig
     db: DatabaseConfig
     api: ApiConfig
+    admins: TGAdmins = TGAdmins()
 
 
-try:
-    settings = Settings()
-except Exception as e:
-    print(e)
+def get_settings() -> Settings:
+    """Get application settings with error handling."""
+    try:
+        return Settings()  # type: ignore
+    except Exception as e:
+        raise RuntimeError(f"Failed to load settings: {e}") from e
+
+
+settings = get_settings()
