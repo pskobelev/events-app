@@ -10,6 +10,7 @@ LOGGING_DEBUG = logging.DEBUG
 logging.basicConfig(level=LOGGING_DEBUG, format=settings.logging.log_format)
 logger = logging.getLogger(__name__)
 
+
 app = FastAPI()
 
 app.include_router(router)
@@ -29,6 +30,7 @@ if __name__ == "__main__":
         )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
+        raise SystemExit(1)
     except Exception as e:
         logger.error("Failed to start server: %s", e)
-        raise
+        raise SystemExit(1)
