@@ -99,7 +99,7 @@ async def handle_user_choice(
                 parse_mode=ParseMode.HTML,
             )
         except Exception as e:
-            logger.error("FAILED", e)
+            logger.error("FAILED: %s", e)
             await callback_query.message.answer("")
     else:
         logger.debug("Current event: %s is not active", event_id)

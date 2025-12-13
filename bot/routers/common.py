@@ -35,16 +35,13 @@ async def start_event(message: Message):
 @router.message(Command(commands=["close"]))
 async def close_events(message: Message, bot: Bot):
     chat_id = message.chat.id
-    logger.debug("Try close in chat, %s", chat_id)
-    await api_close_active_event(chat_id)
-
-    original_text = "Foo"
-
-    new_text = f"Завершено {original_text}"
-
-    await bot.edit_message_text(
-        chat_id=chat_id, message_id=msg_id, text=new_text
-    )
+    logger.debug("Попытка закрытия события в чате %s", chat_id)
+    try:
+        await api_close_active_event(chat_id)
+        await message.answer("Событие успешно завершено ✅")
+    except Exception as e:
+        logger.error("Ошибка при закрытии события: %s", e)
+        await message.answer("Не удалось завершить событие ❌")
 
 
 @router.message(Command(commands=["list"]))
