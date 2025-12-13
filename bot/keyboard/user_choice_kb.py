@@ -6,11 +6,12 @@ from aiogram.types import (
 )
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from config import settings
+
 
 class UserChoice(str, Enum):
     IN_GAME = "В игре ✅"
     PASS = "Пас ⛔"
-    # THINKING = "Думаю 🫠"
 
 
 class UserChoiceCbData(CallbackData, prefix="user-choice"):
@@ -25,8 +26,7 @@ def build_action_kb(event_id, user_id) -> InlineKeyboardMarkup:
             event_id=event_id, choice=action.name
         ).pack()
         builder.button(text=action.value, callback_data=callback_data)
-    # builder.adjust(1)
-    if user_id == 722445:
+    if user_id == settings.admins:
         builder.button(text="Закрыть игру", callback_data="close_event")
     return builder.as_markup()
 
