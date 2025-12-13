@@ -1,6 +1,6 @@
-__all__ = ["User", "Event", "UserEvent", "Base", "db_helper"]
+__all__ = ["User", "Event", "UserEvent", "BaseEvent", "db_helper"]
 
-from .base import Base
+from .base import BaseEvent
 from src.db import db_helper
 from .event import Event, UserEvent
 from .user import User
